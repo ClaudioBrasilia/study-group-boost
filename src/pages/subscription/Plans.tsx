@@ -10,12 +10,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/sonner';
 
+// Define the allowed plan types to match what the AuthContext expects
+type PlanType = 'free' | 'basic' | 'premium';
+
 const Plans: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, updateUserPlan } = useAuth();
 
-  const handleSubscribe = (planId: string) => {
+  const handleSubscribe = (planId: PlanType) => {
     // In a real app, this would connect to a payment processor
     updateUserPlan(planId);
     toast.success(`Subscribed to ${planId} plan!`);
@@ -24,21 +27,21 @@ const Plans: React.FC = () => {
 
   const plans = [
     {
-      id: 'free',
+      id: 'free' as PlanType,
       name: t('plans.free.name'),
       price: t('plans.free.price'),
       features: t('plans.free.features', { returnObjects: true }) as string[],
       isCurrent: user?.plan === 'free'
     },
     {
-      id: 'basic',
+      id: 'basic' as PlanType,
       name: t('plans.basic.name'),
       price: t('plans.basic.price'),
       features: t('plans.basic.features', { returnObjects: true }) as string[],
       isCurrent: user?.plan === 'basic'
     },
     {
-      id: 'premium',
+      id: 'premium' as PlanType,
       name: t('plans.premium.name'),
       price: t('plans.premium.price'),
       features: t('plans.premium.features', { returnObjects: true }) as string[],
@@ -77,7 +80,7 @@ const Plans: React.FC = () => {
             <Button 
               className="w-full" 
               disabled={plans[0].isCurrent}
-              onClick={() => handleSubscribe('free')}
+              onClick={() => handleSubscribe(plans[0].id)}
             >
               {plans[0].isCurrent ? t('plans.current') : t('plans.subscribe')}
             </Button>
@@ -108,7 +111,7 @@ const Plans: React.FC = () => {
             <Button 
               className="w-full bg-study-primary" 
               disabled={plans[1].isCurrent}
-              onClick={() => handleSubscribe('basic')}
+              onClick={() => handleSubscribe(plans[1].id)}
             >
               {plans[1].isCurrent ? t('plans.current') : t('plans.subscribe')}
             </Button>
@@ -139,7 +142,7 @@ const Plans: React.FC = () => {
             <Button 
               className="w-full bg-study-primary" 
               disabled={plans[2].isCurrent}
-              onClick={() => handleSubscribe('premium')}
+              onClick={() => handleSubscribe(plans[2].id)}
             >
               {plans[2].isCurrent ? t('plans.current') : t('plans.subscribe')}
             </Button>
