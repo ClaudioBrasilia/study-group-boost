@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Montserrat', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -61,6 +65,18 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				study: {
+					primary: '#9b87f5',
+					secondary: '#7E69AB',
+					accent: '#33C3F0',
+					success: '#4CAF50',
+					warning: '#FFC107',
+					error: '#F44336',
+					background: '#F6F8FA',
+					card: '#FFFFFF',
+					text: '#333333',
+					lightText: '#757575',
 				}
 			},
 			borderRadius: {
@@ -84,11 +100,21 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-slow': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.7' },
+				},
+				'progress-fill': {
+					'0%': { width: '0%' },
+					'100%': { width: 'var(--progress-width, 100%)' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'progress-fill': 'progress-fill 1s ease-in-out forwards',
 			}
 		}
 	},
