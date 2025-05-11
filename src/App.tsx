@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import Groups from "./pages/Groups";
 import GroupDetail from "./pages/GroupDetail";
 import Progress from "./pages/Progress";
+import Timer from "./pages/Timer";
 import Water from "./pages/Water";
 import Leaderboard from "./pages/Leaderboard";
 import Profile from "./pages/Profile";
@@ -39,6 +40,7 @@ const App = () => {
             <Route path="/groups" element={<Groups />} />
             <Route path="/group/:groupId" element={<GroupDetail />} />
             <Route path="/progress" element={<Progress />} />
+            <Route path="/timer" element={<Timer />} />
             <Route path="/water" element={<Water />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={<Profile />} />

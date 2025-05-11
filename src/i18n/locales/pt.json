@@ -8,8 +8,9 @@
     "groups": "Grupos",
     "progress": "Progresso",
     "water": "Água",
-    "leaders": "Líderes",
-    "profile": "Perfil"
+    "leaders": "Ranking",
+    "profile": "Perfil",
+    "timer": "Cronômetro"
   },
   "home": {
     "getStarted": "Começar"
@@ -117,5 +118,28 @@
   },
   "settings": {
     "title": "Configurações"
+  },
+  "timer": {
+    "title": "Cronômetro de Estudo",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "resume": "Continuar",
+    "stop": "Parar",
+    "reset": "Reiniciar",
+    "selectSubject": "Selecionar matéria",
+    "selectGroup": "Selecionar grupo",
+    "timeElapsed": "Tempo decorrido",
+    "earnedPoints": "Pontos ganhos",
+    "pointsPerMinute": "pontos por minuto",
+    "saveSession": "Salvar sessão",
+    "history": "Histórico",
+    "noSessions": "Nenhuma sessão registrada",
+    "session": "Sessão",
+    "date": "Data",
+    "duration": "Duração",
+    "points": "Pontos",
+    "minutes": "minutos",
+    "seconds": "segundos",
+    "hours": "horas"
   }
 }
