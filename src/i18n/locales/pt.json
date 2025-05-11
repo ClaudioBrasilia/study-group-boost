@@ -1,0 +1,121 @@
+
+{
+  "app": {
+    "name": "StudyBoost",
+    "slogan": "Alcance seus objetivos de estudo junto com amigos"
+  },
+  "navigation": {
+    "groups": "Grupos",
+    "progress": "Progresso",
+    "water": "Água",
+    "leaders": "Líderes",
+    "profile": "Perfil"
+  },
+  "home": {
+    "getStarted": "Começar"
+  },
+  "groups": {
+    "title": "Grupos de Estudo",
+    "search": "Procurar grupos...",
+    "create": "Criar Novo Grupo de Estudo",
+    "noGroups": "Nenhum grupo de estudo encontrado",
+    "createFirst": "Crie seu primeiro grupo",
+    "members": "membros",
+    "fixedGroups": {
+      "vestibularBrasil": "Vestibular Brasil"
+    },
+    "subjects": {
+      "portuguese": "Português",
+      "math": "Matemática",
+      "history": "História",
+      "geography": "Geografia",
+      "physics": "Física",
+      "chemistry": "Química",
+      "biology": "Biologia",
+      "literature": "Literatura",
+      "english": "Inglês",
+      "essay": "Redação"
+    }
+  },
+  "login": {
+    "title": "Entrar",
+    "email": "Email",
+    "password": "Senha",
+    "loginButton": "Entrar",
+    "registerPrompt": "Não tem uma conta?",
+    "registerButton": "Registre-se aqui",
+    "forgotPassword": "Esqueceu a senha?"
+  },
+  "register": {
+    "title": "Criar Conta",
+    "name": "Nome",
+    "email": "Email",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "registerButton": "Registrar",
+    "loginPrompt": "Já tem uma conta?",
+    "loginButton": "Entre aqui"
+  },
+  "plans": {
+    "title": "Escolha Seu Plano",
+    "free": {
+      "name": "Gratuito",
+      "price": "Grátis",
+      "features": [
+        "Entrar em grupos de estudo",
+        "Registros de atividades básicos",
+        "Monitor de água",
+        "Acesso limitado ao ranking"
+      ]
+    },
+    "basic": {
+      "name": "Básico",
+      "price": "R$24,90/mês",
+      "features": [
+        "Todas as funções gratuitas",
+        "Sem anúncios",
+        "Acompanhamento avançado de progresso",
+        "Criação de grupos personalizados"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "price": "R$49,90/mês",
+      "features": [
+        "Todas as funções básicas",
+        "Geração de testes com IA",
+        "Grupos ilimitados",
+        "Análises avançadas"
+      ]
+    },
+    "subscribe": "Assinar",
+    "current": "Seu plano atual"
+  },
+  "aiTests": {
+    "title": "Gerar Teste",
+    "questionsNumber": "Número de questões",
+    "selectSubjects": "Selecionar matérias",
+    "difficulty": "Nível de dificuldade",
+    "difficulties": {
+      "easy": "Fácil",
+      "medium": "Médio",
+      "hard": "Difícil"
+    },
+    "generate": "Gerar Teste",
+    "premiumFeature": "Esta é uma funcionalidade premium",
+    "upgrade": "Faça upgrade para desbloquear"
+  },
+  "groupMessages": {
+    "placeholder": "Digite uma mensagem...",
+    "send": "Enviar",
+    "messageHistory": "Histórico de Mensagens"
+  },
+  "language": {
+    "title": "Idioma",
+    "english": "Inglês",
+    "portuguese": "Português"
+  },
+  "settings": {
+    "title": "Configurações"
+  }
+}

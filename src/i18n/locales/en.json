@@ -1,0 +1,121 @@
+
+{
+  "app": {
+    "name": "StudyBoost",
+    "slogan": "Achieve your study goals together with friends"
+  },
+  "navigation": {
+    "groups": "Groups",
+    "progress": "Progress",
+    "water": "Water",
+    "leaders": "Leaders",
+    "profile": "Profile"
+  },
+  "home": {
+    "getStarted": "Get Started"
+  },
+  "groups": {
+    "title": "Study Groups",
+    "search": "Search groups...",
+    "create": "Create New Study Group",
+    "noGroups": "No study groups found",
+    "createFirst": "Create Your First Group",
+    "members": "members",
+    "fixedGroups": {
+      "vestibularBrasil": "Vestibular Brazil"
+    },
+    "subjects": {
+      "portuguese": "Portuguese",
+      "math": "Mathematics",
+      "history": "History",
+      "geography": "Geography",
+      "physics": "Physics",
+      "chemistry": "Chemistry",
+      "biology": "Biology",
+      "literature": "Literature",
+      "english": "English",
+      "essay": "Essay Writing"
+    }
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "registerPrompt": "Don't have an account?",
+    "registerButton": "Register here",
+    "forgotPassword": "Forgot password?"
+  },
+  "register": {
+    "title": "Create Account",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "registerButton": "Register",
+    "loginPrompt": "Already have an account?",
+    "loginButton": "Login here"
+  },
+  "plans": {
+    "title": "Choose Your Plan",
+    "free": {
+      "name": "Free",
+      "price": "Free",
+      "features": [
+        "Join study groups",
+        "Track basic activities",
+        "Water tracker",
+        "Limited leaderboard access"
+      ]
+    },
+    "basic": {
+      "name": "Basic",
+      "price": "$4.99/month",
+      "features": [
+        "All free features",
+        "No ads",
+        "Advanced progress tracking",
+        "Custom group creation"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "price": "$9.99/month",
+      "features": [
+        "All basic features",
+        "AI test generation",
+        "Unlimited groups",
+        "Advanced analytics"
+      ]
+    },
+    "subscribe": "Subscribe",
+    "current": "Your current plan"
+  },
+  "aiTests": {
+    "title": "Generate Test",
+    "questionsNumber": "Number of questions",
+    "selectSubjects": "Select subjects",
+    "difficulty": "Difficulty level",
+    "difficulties": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "generate": "Generate Test",
+    "premiumFeature": "This is a premium feature",
+    "upgrade": "Upgrade to unlock"
+  },
+  "groupMessages": {
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "messageHistory": "Message History"
+  },
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "portuguese": "Portuguese"
+  },
+  "settings": {
+    "title": "Settings"
+  }
+}
