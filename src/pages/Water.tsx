@@ -7,19 +7,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { useTranslation } from 'react-i18next';
 
 // Mock data for water intake history
 const weeklyWaterData = [
-  { name: 'Mon', intake: 1800 },
-  { name: 'Tue', intake: 2200 },
-  { name: 'Wed', intake: 1600 },
-  { name: 'Thu', intake: 2000 },
-  { name: 'Fri', intake: 2500 },
-  { name: 'Sat', intake: 1900 },
-  { name: 'Sun', intake: 2300 },
+  { name: 'Seg', intake: 1800 },
+  { name: 'Ter', intake: 2200 },
+  { name: 'Qua', intake: 1600 },
+  { name: 'Qui', intake: 2000 },
+  { name: 'Sex', intake: 2500 },
+  { name: 'Sáb', intake: 1900 },
+  { name: 'Dom', intake: 2300 },
 ];
 
 const Water: React.FC = () => {
+  const { t } = useTranslation();
   const [waterIntake, setWaterIntake] = useState(1200); // in ml
   const [cupSize, setCupSize] = useState(250); // in ml
   const [unitType, setUnitType] = useState('ml');
@@ -46,7 +48,7 @@ const Water: React.FC = () => {
   return (
     <PageLayout>
       <div className="mb-6">
-        <h2 className="text-xl font-bold mb-4">Water Intake</h2>
+        <h2 className="text-xl font-bold mb-4">{t('water.title')}</h2>
         
         <Card className="overflow-hidden mb-6">
           <div className="relative bg-gradient-to-br from-blue-400 to-blue-600 p-6 text-white">
@@ -55,9 +57,9 @@ const Water: React.FC = () => {
             ></div>
             <div className="relative z-10 flex flex-col items-center">
               <div className="mb-2 text-center">
-                <div className="text-xs text-blue-100">Today's Intake</div>
+                <div className="text-xs text-blue-100">{t('water.todaysIntake')}</div>
                 <div className="text-3xl font-bold">{displayIntake} {unitType}</div>
-                <div className="text-xs text-blue-100">Goal: {displayGoal} {unitType}</div>
+                <div className="text-xs text-blue-100">{t('water.goal')}: {displayGoal} {unitType}</div>
               </div>
               <Progress value={progressPercentage} className="h-3 bg-blue-300/50 w-full max-w-52" />
             </div>
@@ -68,7 +70,7 @@ const Water: React.FC = () => {
                 <TabsList className="grid grid-cols-3 h-8">
                   <TabsTrigger value="ml" className="text-xs">ml</TabsTrigger>
                   <TabsTrigger value="L" className="text-xs">L</TabsTrigger>
-                  <TabsTrigger value="cup" className="text-xs">Cup</TabsTrigger>
+                  <TabsTrigger value="cup" className="text-xs">Copo</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
@@ -81,7 +83,7 @@ const Water: React.FC = () => {
                 onClick={() => handleAddWater(cupSize)}
               >
                 <Droplet size={18} className="text-blue-500 mb-1" />
-                <span className="text-xs">+1 Cup</span>
+                <span className="text-xs">+1 Copo</span>
               </Button>
               
               <Button 
@@ -110,7 +112,7 @@ const Water: React.FC = () => {
                 className="bg-blue-500 hover:bg-blue-600"
                 onClick={() => handleAddWater(250)}
               >
-                <Plus size={18} className="mr-1" /> Add Water
+                <Plus size={18} className="mr-1" /> {t('water.addWater')}
               </Button>
             </div>
           </CardContent>
@@ -118,7 +120,7 @@ const Water: React.FC = () => {
         
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-base">Weekly Water Intake</CardTitle>
+            <CardTitle className="text-base">{t('water.weeklyIntake')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-64">
@@ -128,7 +130,7 @@ const Water: React.FC = () => {
                   <XAxis dataKey="name" />
                   <YAxis tickFormatter={(value) => `${value}${unitType}`} />
                   <Tooltip 
-                    formatter={(value) => [`${value} ${unitType}`, 'Intake']} 
+                    formatter={(value) => [`${value} ${unitType}`, 'Consumo']} 
                     labelFormatter={(label) => `${label}`}
                   />
                   <Bar dataKey="intake" fill="#33C3F0" radius={[4, 4, 0, 0]} />

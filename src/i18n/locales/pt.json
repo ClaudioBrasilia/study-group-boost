@@ -184,5 +184,59 @@
     "selectType": "Selecione o tipo de meta",
     "updateProgress": "Atualizar Progresso",
     "addProgress": "Adicionar Progresso"
+  },
+  "profile": {
+    "title": "Perfil",
+    "level": "Nível",
+    "scholar": "Estudante",
+    "points": "pontos",
+    "rank": "Classificação",
+    "toNextLevel": "pontos para o próximo nível",
+    "studyStats": "Estatísticas de Estudo",
+    "myGroups": "Meus Grupos",
+    "achievements": "Conquistas",
+    "earned": "Conquistadas",
+    "locked": "Bloqueadas",
+    "notificationSettings": "Configurações de Notificação",
+    "goalReminders": "Lembretes de Metas",
+    "dailyReminders": "Receber lembretes diários para suas metas",
+    "groupActivity": "Atividade do Grupo",
+    "groupUpdates": "Atualizações dos seus grupos de estudo",
+    "achievementNotifications": "Notificações de Conquistas",
+    "achievementAlerts": "Notificações quando você ganha conquistas",
+    "weeklyReport": "Relatório Semanal",
+    "progressSummary": "Resumo semanal do seu progresso",
+    "logout": "Sair"
+  },
+  "water": {
+    "title": "Consumo de Água",
+    "intake": "Consumo de Hoje",
+    "goal": "Meta",
+    "weeklyIntake": "Consumo Semanal de Água",
+    "addWater": "Adicionar Água",
+    "todaysIntake": "Consumo de Hoje"
+  },
+  "leaderboard": {
+    "title": "Ranking",
+    "global": "Global",
+    "group": "Grupo",
+    "week": "Semana",
+    "month": "Mês",
+    "allTime": "Todo Período",
+    "selectGroup": "Selecionar grupo",
+    "you": "Você",
+    "points": "pontos"
+  },
+  "progress": {
+    "title": "Meu Progresso",
+    "pagesRead": "Páginas Lidas",
+    "studyTime": "Tempo de Estudo",
+    "exercises": "Exercícios",
+    "studyStreak": "Sequência de Estudo",
+    "days": "dias",
+    "studyTimeByDay": "Tempo de Estudo por Dia",
+    "pagesReadByDay": "Páginas Lidas por Dia",
+    "studyBySubject": "Estudo por Matéria",
+    "minutes": "min"
   }
 }

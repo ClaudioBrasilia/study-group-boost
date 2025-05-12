@@ -6,30 +6,32 @@ import PageLayout from '@/components/layout/PageLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 // Mock data for study stats
 const weeklyData = [
-  { name: 'Mon', pages: 23, time: 45, exercises: 5 },
-  { name: 'Tue', pages: 15, time: 30, exercises: 8 },
-  { name: 'Wed', pages: 30, time: 60, exercises: 12 },
-  { name: 'Thu', pages: 27, time: 50, exercises: 10 },
-  { name: 'Fri', pages: 18, time: 40, exercises: 7 },
-  { name: 'Sat', pages: 35, time: 75, exercises: 15 },
-  { name: 'Sun', pages: 20, time: 55, exercises: 9 },
+  { name: 'Seg', pages: 23, time: 45, exercises: 5 },
+  { name: 'Ter', pages: 15, time: 30, exercises: 8 },
+  { name: 'Qua', pages: 30, time: 60, exercises: 12 },
+  { name: 'Qui', pages: 27, time: 50, exercises: 10 },
+  { name: 'Sex', pages: 18, time: 40, exercises: 7 },
+  { name: 'Sáb', pages: 35, time: 75, exercises: 15 },
+  { name: 'Dom', pages: 20, time: 55, exercises: 9 },
 ];
 
 const subjectData = [
-  { name: 'Math', value: 35 },
-  { name: 'Physics', value: 25 },
-  { name: 'Literature', value: 20 },
-  { name: 'Chemistry', value: 15 },
-  { name: 'History', value: 5 },
+  { name: 'Matemática', value: 35 },
+  { name: 'Física', value: 25 },
+  { name: 'Literatura', value: 20 },
+  { name: 'Química', value: 15 },
+  { name: 'História', value: 5 },
 ];
 
 const COLORS = ['#9b87f5', '#7E69AB', '#33C3F0', '#4CAF50', '#FFC107'];
 
 const Progress: React.FC = () => {
   const [timeRange, setTimeRange] = useState('week');
+  const { t } = useTranslation();
 
   // Calculate total stats
   const totalPages = weeklyData.reduce((sum, day) => sum + day.pages, 0);
@@ -40,12 +42,12 @@ const Progress: React.FC = () => {
   return (
     <PageLayout>
       <div className="flex flex-wrap justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">My Progress</h2>
+        <h2 className="text-xl font-bold">{t('progress.title')}</h2>
         <Tabs value={timeRange} onValueChange={setTimeRange} className="w-auto">
           <TabsList className="grid grid-cols-3 h-8">
-            <TabsTrigger value="week" className="text-xs">Week</TabsTrigger>
-            <TabsTrigger value="month" className="text-xs">Month</TabsTrigger>
-            <TabsTrigger value="year" className="text-xs">Year</TabsTrigger>
+            <TabsTrigger value="week" className="text-xs">{t('leaderboard.week')}</TabsTrigger>
+            <TabsTrigger value="month" className="text-xs">{t('leaderboard.month')}</TabsTrigger>
+            <TabsTrigger value="year" className="text-xs">{t('progress.title')}</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -53,7 +55,7 @@ const Progress: React.FC = () => {
       <div className="grid grid-cols-2 gap-3 mb-6">
         <Card>
           <CardHeader className="p-3">
-            <CardTitle className="text-sm">Pages Read</CardTitle>
+            <CardTitle className="text-sm">{t('progress.pagesRead')}</CardTitle>
           </CardHeader>
           <CardContent className="p-3 pt-0">
             <div className="text-2xl font-bold text-study-primary">{totalPages}</div>
@@ -61,15 +63,15 @@ const Progress: React.FC = () => {
         </Card>
         <Card>
           <CardHeader className="p-3">
-            <CardTitle className="text-sm">Study Time</CardTitle>
+            <CardTitle className="text-sm">{t('progress.studyTime')}</CardTitle>
           </CardHeader>
           <CardContent className="p-3 pt-0">
-            <div className="text-2xl font-bold text-study-primary">{totalTime} min</div>
+            <div className="text-2xl font-bold text-study-primary">{totalTime} {t('progress.minutes')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="p-3">
-            <CardTitle className="text-sm">Exercises</CardTitle>
+            <CardTitle className="text-sm">{t('progress.exercises')}</CardTitle>
           </CardHeader>
           <CardContent className="p-3 pt-0">
             <div className="text-2xl font-bold text-study-primary">{totalExercises}</div>
@@ -77,12 +79,12 @@ const Progress: React.FC = () => {
         </Card>
         <Card>
           <CardHeader className="p-3">
-            <CardTitle className="text-sm">Study Streak</CardTitle>
+            <CardTitle className="text-sm">{t('progress.studyStreak')}</CardTitle>
           </CardHeader>
           <CardContent className="p-3 pt-0">
             <div className="flex items-center">
               <Calendar size={18} className="text-study-primary mr-1" />
-              <span className="text-2xl font-bold text-study-primary">{streakDays} days</span>
+              <span className="text-2xl font-bold text-study-primary">{streakDays} {t('progress.days')}</span>
             </div>
           </CardContent>
         </Card>
@@ -90,7 +92,7 @@ const Progress: React.FC = () => {
       
       <Card className="mb-6">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Study Time by Day</CardTitle>
+          <CardTitle className="text-base">{t('progress.studyTimeByDay')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64">
@@ -100,7 +102,7 @@ const Progress: React.FC = () => {
                 <XAxis dataKey="name" />
                 <YAxis tickFormatter={(value) => `${value}m`} />
                 <Tooltip 
-                  formatter={(value) => [`${value} minutes`, 'Study Time']} 
+                  formatter={(value) => [`${value} minutos`, t('progress.studyTime')]} 
                   labelFormatter={(label) => `${label}`}
                 />
                 <Bar dataKey="time" fill="#9b87f5" radius={[4, 4, 0, 0]} />
@@ -112,7 +114,7 @@ const Progress: React.FC = () => {
       
       <Card className="mb-6">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Pages Read by Day</CardTitle>
+          <CardTitle className="text-base">{t('progress.pagesReadByDay')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64">
@@ -121,7 +123,7 @@ const Progress: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`${value} pages`, 'Pages Read']} />
+                <Tooltip formatter={(value) => [`${value} páginas`, t('progress.pagesRead')]} />
                 <Bar dataKey="pages" fill="#33C3F0" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
@@ -131,7 +133,7 @@ const Progress: React.FC = () => {
       
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">Study by Subject</CardTitle>
+          <CardTitle className="text-base">{t('progress.studyBySubject')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-64 flex items-center justify-center">
@@ -152,7 +154,7 @@ const Progress: React.FC = () => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [`${value}%`, 'Percentage']} />
+                  <Tooltip formatter={(value) => [`${value}%`, 'Percentagem']} />
                 </PieChart>
               </ResponsiveContainer>
             </div>

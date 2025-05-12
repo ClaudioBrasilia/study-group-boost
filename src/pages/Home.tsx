@@ -40,7 +40,7 @@ const Home: React.FC = () => {
             className="w-full bg-study-primary opacity-50" 
             disabled
           >
-            Loading...
+            Carregando...
           </Button>
         ) : user ? (
           <Button 

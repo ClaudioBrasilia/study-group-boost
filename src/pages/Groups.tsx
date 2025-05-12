@@ -45,25 +45,25 @@ const CreateGroupForm: React.FC<{ onCreateGroup: (name: string, description: str
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="text-sm font-medium">Group Name</label>
+        <label htmlFor="name" className="text-sm font-medium">Nome do Grupo</label>
         <Input 
           id="name" 
           value={name} 
           onChange={(e) => setName(e.target.value)} 
-          placeholder="Enter group name" 
+          placeholder="Digite o nome do grupo" 
           required
         />
       </div>
       <div>
-        <label htmlFor="description" className="text-sm font-medium">Description (optional)</label>
+        <label htmlFor="description" className="text-sm font-medium">Descrição (opcional)</label>
         <Input 
           id="description" 
           value={description} 
           onChange={(e) => setDescription(e.target.value)} 
-          placeholder="Describe your study group"
+          placeholder="Descreva seu grupo de estudo"
         />
       </div>
-      <Button type="submit" className="w-full">Create Group</Button>
+      <Button type="submit" className="w-full">Criar Grupo</Button>
     </form>
   );
 };
@@ -96,7 +96,7 @@ const Groups: React.FC = () => {
   const handleCreateGroup = (name: string, description: string) => {
     // Free users can only join groups, not create them
     if (user && user.plan === 'free') {
-      toast.error('Creating groups requires a paid subscription');
+      toast.error('Criar grupos requer uma assinatura paga');
       setOpen(false);
       navigate('/plans');
       return;
@@ -160,7 +160,7 @@ const Groups: React.FC = () => {
               <div className="flex justify-between items-start">
                 <h3 className="font-semibold text-lg">{group.name}</h3>
                 {group.isFixed && (
-                  <Badge className="bg-study-primary">Fixed Group</Badge>
+                  <Badge className="bg-study-primary">Grupo Fixo</Badge>
                 )}
               </div>
               <p className="text-sm text-gray-500">{group.description}</p>

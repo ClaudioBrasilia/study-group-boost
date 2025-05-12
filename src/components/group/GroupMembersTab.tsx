@@ -4,12 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Member } from '@/types/groupTypes';
+import { useTranslation } from 'react-i18next';
 
 interface GroupMembersTabProps {
   members: Member[];
 }
 
 const GroupMembersTab: React.FC<GroupMembersTabProps> = ({ members }) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">

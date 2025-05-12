@@ -97,14 +97,14 @@ const AppHeader: React.FC = () => {
                 logout();
                 navigate('/login');
               }}>
-                Logout
+                Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
           location.pathname !== '/login' && location.pathname !== '/register' && (
             <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
-              Login
+              {t('login.title')}
             </Button>
           )
         )}
