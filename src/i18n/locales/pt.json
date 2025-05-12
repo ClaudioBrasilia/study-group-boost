@@ -25,6 +25,9 @@
     "fixedGroups": {
       "vestibularBrasil": "Vestibular Brasil"
     },
+    "addSubjects": "Adicionar Matérias",
+    "addVestibular": "Adicionar Módulo Vestibular",
+    "deleteSubject": "Excluir Matéria",
     "subjects": {
       "portuguese": "Português",
       "math": "Matemática",
@@ -71,7 +74,7 @@
     },
     "basic": {
       "name": "Básico",
-      "price": "R$24,90/mês",
+      "price": "R$9,90/mês",
       "features": [
         "Todas as funções gratuitas",
         "Sem anúncios",
@@ -81,7 +84,7 @@
     },
     "premium": {
       "name": "Premium",
-      "price": "R$49,90/mês",
+      "price": "R$14,90/mês",
       "features": [
         "Todas as funções básicas",
         "Geração de testes com IA",
@@ -141,5 +144,45 @@
     "minutes": "minutos",
     "seconds": "segundos",
     "hours": "horas"
+  },
+  "files": {
+    "title": "Arquivos",
+    "upload": "Enviar arquivo",
+    "noFiles": "Nenhum arquivo disponível",
+    "download": "Baixar",
+    "view": "Visualizar",
+    "delete": "Excluir",
+    "fileName": "Nome do arquivo",
+    "fileSize": "Tamanho",
+    "uploadedBy": "Enviado por",
+    "uploadedAt": "Data de envio",
+    "uploadSuccess": "Arquivo enviado com sucesso",
+    "uploadError": "Erro ao enviar arquivo",
+    "deleteConfirm": "Tem certeza que deseja excluir este arquivo?",
+    "deleteSuccess": "Arquivo excluído com sucesso",
+    "permissionDenied": "Você não tem permissão para esta ação"
+  },
+  "goals": {
+    "title": "Metas",
+    "addGoal": "Adicionar Meta",
+    "noGoals": "Nenhuma meta definida",
+    "subject": "Matéria",
+    "type": "Tipo de meta",
+    "progress": "Progresso",
+    "target": "Objetivo",
+    "current": "Atual",
+    "types": {
+      "pages": "Páginas lidas",
+      "exercises": "Exercícios resolvidos",
+      "time": "Tempo de estudo (minutos)"
+    },
+    "createGoal": "Criar Meta",
+    "editGoal": "Editar Meta",
+    "deleteGoal": "Excluir Meta",
+    "selectSubject": "Selecione uma matéria",
+    "enterTarget": "Digite o objetivo",
+    "selectType": "Selecione o tipo de meta",
+    "updateProgress": "Atualizar Progresso",
+    "addProgress": "Adicionar Progresso"
   }
 }
