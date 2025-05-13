@@ -10,7 +10,8 @@
     "progress": "Progress",
     "water": "Water",
     "leaders": "Leaders",
-    "profile": "Profile"
+    "profile": "Profile",
+    "timer": "Timer"
   },
   "home": {
     "getStarted": "Get Started"
@@ -25,6 +26,9 @@
     "fixedGroups": {
       "vestibularBrasil": "Vestibular Brazil"
     },
+    "addSubjects": "Add Subjects",
+    "addVestibular": "Add Vestibular Module",
+    "deleteSubject": "Delete Subject",
     "subjects": {
       "portuguese": "Portuguese",
       "math": "Mathematics",
@@ -119,5 +123,33 @@
     "saveApiKey": "Save & Continue",
     "apiKeySaved": "API key saved successfully",
     "resetTimer": "Timer reset"
+  },
+  "profile": {
+    "title": "Profile",
+    "level": "Level",
+    "scholar": "Scholar",
+    "points": "points",
+    "rank": "Rank",
+    "toNextLevel": "points to next level",
+    "studyStats": "Study Stats",
+    "myGroups": "My Groups",
+    "achievements": "Achievements",
+    "earned": "Earned",
+    "locked": "Locked",
+    "notificationSettings": "Notification Settings",
+    "goalReminders": "Goal Reminders",
+    "dailyReminders": "Get daily reminders for your goals",
+    "groupActivity": "Group Activity",
+    "groupUpdates": "Updates from your study groups",
+    "achievementNotifications": "Achievements",
+    "achievementAlerts": "Notifications when you earn achievements",
+    "weeklyReport": "Weekly Report",
+    "progressSummary": "Weekly summary of your progress",
+    "logout": "Logout"
+  },
+  "language": {
+    "title": "Language",
+    "english": "English",
+    "portuguese": "Portuguese"
   }
 }

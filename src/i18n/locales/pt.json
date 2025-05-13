@@ -1,3 +1,4 @@
+
 {
   "app": {
     "name": "StudyBoost",
@@ -107,7 +108,21 @@
     },
     "generate": "Gerar Teste",
     "premiumFeature": "Esta é uma funcionalidade premium",
-    "upgrade": "Faça upgrade para desbloquear"
+    "upgrade": "Faça upgrade para desbloquear",
+    "generatedTest": "Teste Gerado",
+    "createAnother": "Criar Outro Teste",
+    "saveTest": "Salvar Teste",
+    "submitAnswers": "Enviar Respostas",
+    "generating": "Gerando...",
+    "selectAtLeastOne": "Selecione pelo menos uma matéria",
+    "generatingSuccess": "Teste gerado com sucesso!",
+    "generatingFailed": "Falha ao gerar teste",
+    "apiKeyTitle": "Insira sua Chave da API OpenAI",
+    "apiKeyDescription": "Para gerar questões de teste, você precisa fornecer uma chave da API OpenAI",
+    "apiKeyPlaceholder": "Insira sua chave da API OpenAI",
+    "saveApiKey": "Salvar e Continuar",
+    "apiKeySaved": "Chave da API salva com sucesso",
+    "resetTimer": "Reiniciar cronômetro"
   },
   "groupMessages": {
     "placeholder": "Digite uma mensagem...",
