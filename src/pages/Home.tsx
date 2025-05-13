@@ -43,12 +43,22 @@ const Home: React.FC = () => {
             {t('loading')}
           </Button>
         ) : user ? (
-          <Button 
-            className="w-full bg-study-primary hover:bg-opacity-90" 
-            onClick={() => navigate('/groups')}
-          >
-            {t('navigation.groups')}
-          </Button>
+          <>
+            <Button 
+              className="w-full bg-study-primary hover:bg-opacity-90" 
+              onClick={() => navigate('/groups')}
+            >
+              {t('navigation.groups')}
+            </Button>
+            {user.plan === 'premium' && (
+              <Button 
+                className="w-full bg-study-secondary hover:bg-opacity-90" 
+                onClick={() => navigate('/generate-test')}
+              >
+                {t('aiTests.title')}
+              </Button>
+            )}
+          </>
         ) : (
           <>
             <Button 

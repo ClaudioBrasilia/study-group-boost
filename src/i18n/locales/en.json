@@ -104,19 +104,19 @@
     },
     "generate": "Generate Test",
     "premiumFeature": "This is a premium feature",
-    "upgrade": "Upgrade to unlock"
-  },
-  "groupMessages": {
-    "placeholder": "Type a message...",
-    "send": "Send",
-    "messageHistory": "Message History"
-  },
-  "language": {
-    "title": "Language",
-    "english": "English",
-    "portuguese": "Portuguese"
-  },
-  "settings": {
-    "title": "Settings"
+    "upgrade": "Upgrade to unlock",
+    "generatedTest": "Generated Test",
+    "createAnother": "Create Another Test",
+    "saveTest": "Save Test",
+    "submitAnswers": "Submit Answers",
+    "generating": "Generating...",
+    "selectAtLeastOne": "Please select at least one subject",
+    "generatingSuccess": "Test generated successfully!",
+    "generatingFailed": "Failed to generate test",
+    "apiKeyTitle": "Enter OpenAI API Key",
+    "apiKeyDescription": "To generate test questions, you need to provide an OpenAI API key",
+    "apiKeyPlaceholder": "Enter your OpenAI API key",
+    "saveApiKey": "Save & Continue",
+    "apiKeySaved": "API key saved successfully",
+    "resetTimer": "Timer reset"
   }
-}
