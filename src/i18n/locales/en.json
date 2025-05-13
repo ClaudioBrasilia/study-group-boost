@@ -4,6 +4,7 @@
     "name": "StudyBoost",
     "slogan": "Achieve your study goals together with friends"
   },
+  "loading": "Loading...",
   "navigation": {
     "groups": "Groups",
     "progress": "Progress",

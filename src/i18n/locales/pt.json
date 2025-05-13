@@ -1,9 +1,9 @@
-
 {
   "app": {
     "name": "StudyBoost",
     "slogan": "Alcance seus objetivos de estudo junto com amigos"
   },
+  "loading": "Carregando...",
   "navigation": {
     "groups": "Grupos",
     "progress": "Progresso",

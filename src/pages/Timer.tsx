@@ -40,6 +40,9 @@ interface StudySession {
 // Points per minute of study
 const POINTS_PER_MINUTE = 1;
 
+// Key for storing timer state in localStorage
+const TIMER_STATE_KEY = 'studyBoostTimerState';
+
 const Timer: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -54,7 +57,7 @@ const Timer: React.FC = () => {
   // Refs for interval management
   const intervalRef = useRef<number | null>(null);
 
-  // Load saved sessions from localStorage on component mount
+  // Load saved sessions and timer state from localStorage on component mount
   useEffect(() => {
     const savedSessions = localStorage.getItem('studySessions');
     if (savedSessions) {
@@ -64,6 +67,20 @@ const Timer: React.FC = () => {
       }));
       setStudySessions(parsedSessions);
     }
+    
+    // Load timer state if it exists
+    const savedTimerState = localStorage.getItem(TIMER_STATE_KEY);
+    if (savedTimerState) {
+      const { seconds: savedSeconds, isRunning: wasRunning, selectedSubject: savedSubject, selectedGroup: savedGroup } = JSON.parse(savedTimerState);
+      setSeconds(savedSeconds);
+      setSelectedSubject(savedSubject);
+      setSelectedGroup(savedGroup);
+      
+      // Resume timer if it was running
+      if (wasRunning) {
+        setIsRunning(true);
+      }
+    }
   }, []);
   
   // Save sessions to localStorage when they change
@@ -72,6 +89,20 @@ const Timer: React.FC = () => {
       localStorage.setItem('studySessions', JSON.stringify(studySessions));
     }
   }, [studySessions]);
+  
+  // Save timer state to localStorage whenever it changes
+  useEffect(() => {
+    if (isRunning || seconds > 0) {
+      localStorage.setItem(TIMER_STATE_KEY, JSON.stringify({
+        seconds,
+        isRunning,
+        selectedSubject,
+        selectedGroup
+      }));
+    } else if (seconds === 0) {
+      localStorage.removeItem(TIMER_STATE_KEY);
+    }
+  }, [seconds, isRunning, selectedSubject, selectedGroup]);
   
   // Handle timer logic
   useEffect(() => {
@@ -122,9 +153,14 @@ const Timer: React.FC = () => {
   };
   
   const handleReset = () => {
-    setIsRunning(false);
-    setSeconds(0);
-    toast.info('Cronômetro reiniciado');
+    // Apenas permitir reiniciar se o cronômetro não estiver em execução
+    if (!isRunning) {
+      setSeconds(0);
+      localStorage.removeItem(TIMER_STATE_KEY);
+      toast.info('Cronômetro reiniciado');
+    } else {
+      toast.error('Pause o cronômetro antes de reiniciar');
+    }
   };
   
   const handleStop = () => {
@@ -151,6 +187,9 @@ const Timer: React.FC = () => {
     };
     
     setStudySessions([newSession, ...studySessions]);
+    
+    // Remover o estado do cronômetro do localStorage após finalizar a sessão
+    localStorage.removeItem(TIMER_STATE_KEY);
     
     // In a real app, you would update the user's points in the backend
     toast.success(`Sessão de estudo concluída! Você ganhou ${points} pontos!`);
@@ -240,7 +279,7 @@ const Timer: React.FC = () => {
                 {t('timer.stop')}
               </Button>
               
-              <Button variant="outline" onClick={handleReset} disabled={seconds === 0}>
+              <Button variant="outline" onClick={handleReset} disabled={seconds === 0 || isRunning}>
                 <RotateCcw size={18} />
                 <span className="sr-only">{t('timer.reset')}</span>
               </Button>
