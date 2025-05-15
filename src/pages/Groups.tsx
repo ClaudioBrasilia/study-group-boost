@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, User, Users, Crown } from 'lucide-react';
@@ -178,7 +179,9 @@ const Groups: React.FC = () => {
               <div className="flex justify-between items-start">
                 <h3 className="font-semibold text-lg flex items-center">
                   {group.name}
-                  {group.isPremium && <Crown className="ml-2 h-4 w-4 text-yellow-500" title="Grupo Premium" />}
+                  {group.isPremium && (
+                    <Crown className="ml-2 h-4 w-4 text-yellow-500" aria-label="Grupo Premium" />
+                  )}
                 </h3>
                 <div className="flex gap-1">
                   {group.isFixed && (
