@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Crown } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import PageLayout from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ const Plans: React.FC = () => {
   const handleSubscribe = (planId: PlanType) => {
     // In a real app, this would connect to a payment processor
     updateUserPlan(planId);
-    toast.success(`Subscribed to ${planId} plan!`);
+    toast.success(`Você assinou o plano ${planId}!`);
     navigate('/groups');
   };
 
@@ -45,7 +45,8 @@ const Plans: React.FC = () => {
       name: t('plans.premium.name'),
       price: t('plans.premium.price'),
       features: t('plans.premium.features', { returnObjects: true }) as string[],
-      isCurrent: user?.plan === 'premium'
+      isCurrent: user?.plan === 'premium',
+      exclusiveFeatures: ['Vestibular Brasil']
     }
   ];
 
@@ -119,10 +120,18 @@ const Plans: React.FC = () => {
         </Card>
         
         {/* Premium Plan */}
-        <Card className={`border-2 ${plans[2].isCurrent ? 'border-study-primary' : 'border-transparent'}`}>
+        <Card className={`border-2 ${plans[2].isCurrent ? 'border-study-primary' : 'border-transparent'} relative overflow-hidden`}>
+          {/* Decorative badge */}
+          <div className="absolute top-0 right-0 bg-gradient-to-l from-yellow-500 to-yellow-400 text-white text-xs font-bold px-4 py-1 -mr-8 transform rotate-45 translate-x-2 translate-y-3">
+            PREMIUM
+          </div>
+          
           <CardHeader>
             <CardTitle className="flex justify-between items-center">
-              {plans[2].name}
+              <div className="flex items-center">
+                {plans[2].name}
+                <Crown className="ml-2 h-4 w-4 text-yellow-500" />
+              </div>
               {plans[2].isCurrent && <Badge className="bg-study-primary">{t('plans.current')}</Badge>}
             </CardTitle>
             <div className="text-2xl font-bold">{plans[2].price}</div>
@@ -136,6 +145,21 @@ const Plans: React.FC = () => {
                   <span>{feature}</span>
                 </li>
               ))}
+              {/* Exclusive features */}
+              <li className="mt-4 pt-4 border-t border-gray-200">
+                <h4 className="text-sm font-medium mb-2 flex items-center">
+                  <Crown className="mr-1 h-4 w-4 text-yellow-500" />
+                  Conteúdo Exclusivo:
+                </h4>
+                <ul className="space-y-2 pl-6">
+                  {plans[2].exclusiveFeatures?.map((feature, index) => (
+                    <li key={`exclusive-${index}`} className="flex items-start">
+                      <CheckCircle2 className="mr-2 h-5 w-5 text-yellow-500 flex-shrink-0" />
+                      <span className="font-medium">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </li>
             </ul>
           </CardContent>
           <CardFooter>

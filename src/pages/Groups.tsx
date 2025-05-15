@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, User, Users } from 'lucide-react';
+import { Plus, Search, User, Users, Crown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import PageLayout from '@/components/layout/PageLayout';
@@ -17,11 +16,19 @@ interface Group {
   members: number;
   description: string;
   isFixed?: boolean;
+  isPremium?: boolean;
 }
 
 // Mock data for groups
 const MOCK_GROUPS: Group[] = [
-  { id: 'vestibular-brasil', name: 'Vestibular Brasil', members: 120, description: 'Grupo oficial para estudantes se preparando para vestibulares brasileiros', isFixed: true },
+  { 
+    id: 'vestibular-brasil', 
+    name: 'Vestibular Brasil', 
+    members: 120, 
+    description: 'Grupo oficial para estudantes se preparando para vestibulares brasileiros', 
+    isFixed: true,
+    isPremium: true  // Marcando o grupo como premium
+  },
   { id: '1', name: 'Math Masters', members: 8, description: 'Algebra and calculus study group' },
   { id: '2', name: 'Physics Club', members: 5, description: 'For physics enthusiasts' },
   { id: '3', name: 'Literature Circle', members: 12, description: 'Classic literature discussions' },
@@ -116,6 +123,17 @@ const Groups: React.FC = () => {
     navigate(`/group/${newGroup.id}`);
   };
 
+  const handleGroupClick = (group: Group) => {
+    // Verificar se o grupo é premium e se o usuário tem acesso
+    if (group.isPremium && user?.plan !== 'premium') {
+      toast.error('Este é um grupo exclusivo para usuários Premium');
+      navigate('/plans'); // Redireciona para a página de planos
+      return;
+    }
+    
+    navigate(`/group/${group.id}`);
+  };
+
   const filteredGroups = groups.filter(group => 
     group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     group.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -155,13 +173,21 @@ const Groups: React.FC = () => {
             <div 
               key={group.id}
               className={`card hover:border-study-primary cursor-pointer transition-colors ${group.isFixed ? 'border-l-4 border-l-study-primary' : ''}`}
-              onClick={() => navigate(`/group/${group.id}`)}
+              onClick={() => handleGroupClick(group)}
             >
               <div className="flex justify-between items-start">
-                <h3 className="font-semibold text-lg">{group.name}</h3>
-                {group.isFixed && (
-                  <Badge className="bg-study-primary">Grupo Fixo</Badge>
-                )}
+                <h3 className="font-semibold text-lg flex items-center">
+                  {group.name}
+                  {group.isPremium && <Crown className="ml-2 h-4 w-4 text-yellow-500" title="Grupo Premium" />}
+                </h3>
+                <div className="flex gap-1">
+                  {group.isFixed && (
+                    <Badge className="bg-study-primary">Grupo Fixo</Badge>
+                  )}
+                  {group.isPremium && (
+                    <Badge className="bg-yellow-500">Premium</Badge>
+                  )}
+                </div>
               </div>
               <p className="text-sm text-gray-500">{group.description}</p>
               <div className="flex items-center mt-2">
