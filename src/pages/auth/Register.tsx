@@ -5,40 +5,68 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/sonner';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import PageLayout from '@/components/layout/PageLayout';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 
-interface RegisterFormValues {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+// Define validation schema
+const registerSchema = z.object({
+  name: z.string()
+    .min(3, 'Nome deve ter pelo menos 3 caracteres')
+    .max(50, 'Nome não pode ter mais de 50 caracteres'),
+  email: z.string()
+    .email('Digite um email válido')
+    .min(1, 'Email é obrigatório'),
+  password: z.string()
+    .min(8, 'A senha deve ter pelo menos 8 caracteres')
+    .max(50, 'A senha não pode ter mais de 50 caracteres'),
+  confirmPassword: z.string()
+    .min(1, 'Confirme sua senha'),
+  acceptTerms: z.boolean()
+    .refine(val => val === true, {
+      message: 'Você deve aceitar os termos de uso e política de privacidade'
+    })
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "As senhas não coincidem",
+  path: ["confirmPassword"],
+});
+
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const Register: React.FC = () => {
   const { t } = useTranslation();
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [registerError, setRegisterError] = useState<string | null>(null);
   
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<RegisterFormValues>();
-  const password = watch('password', '');
+  const form = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      acceptTerms: false
+    }
+  });
   
   const onSubmit = async (data: RegisterFormValues) => {
-    if (data.password !== data.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
-    
     try {
       setIsLoading(true);
+      setRegisterError(null);
       await registerUser(data.name, data.email, data.password);
-      toast.success('Registration successful');
+      toast.success('Registro realizado com sucesso');
       navigate('/groups');
     } catch (error) {
-      toast.error('Registration failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      setRegisterError((error instanceof Error) ? error.message : 'Ocorreu um erro ao registrar');
+      toast.error('Falha no registro: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
     } finally {
       setIsLoading(false);
     }
@@ -52,78 +80,116 @@ const Register: React.FC = () => {
             <h1 className="text-2xl font-bold text-study-primary">{t('register.title')}</h1>
           </div>
           
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">{t('register.name')}</Label>
-              <Input
-                id="name"
-                type="text"
-                {...register('name', { required: 'Name is required' })}
+          {registerError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{registerError}</AlertDescription>
+            </Alert>
+          )}
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('register.name')}</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Seu nome completo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.name && (
-                <p className="text-sm text-red-500">{errors.name.message}</p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('register.email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                {...register('email', { 
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Invalid email address'
-                  }
-                })}
+              
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('register.email')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="email" 
+                        placeholder="seu@email.com" 
+                        autoComplete="email"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="password">{t('register.password')}</Label>
-              <Input
-                id="password"
-                type="password"
-                {...register('password', { 
-                  required: 'Password is required',
-                  minLength: {
-                    value: 8,
-                    message: 'Password must be at least 8 characters'
-                  }
-                })}
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('register.password')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="password"
+                        autoComplete="new-password"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t('register.confirmPassword')}</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                {...register('confirmPassword', { 
-                  required: 'Please confirm your password',
-                  validate: value => value === password || 'Passwords do not match'
-                })}
+              
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('register.confirmPassword')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="password"
+                        autoComplete="new-password"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.confirmPassword && (
-                <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-            
-            <Button
-              type="submit"
-              className="w-full bg-study-primary"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Loading...' : t('register.registerButton')}
-            </Button>
-          </form>
+              
+              <FormField
+                control={form.control}
+                name="acceptTerms"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-normal">
+                        Aceito os <Link to="/terms" className="text-study-primary hover:underline">Termos de Uso</Link>
+                        {' '}e a{' '}
+                        <Link to="/privacy" className="text-study-primary hover:underline">Política de Privacidade</Link>
+                      </FormLabel>
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
+              
+              <Button
+                type="submit"
+                className="w-full bg-study-primary"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Carregando...' : t('register.registerButton')}
+              </Button>
+            </form>
+          </Form>
           
           <div className="text-center text-sm">
             <p>

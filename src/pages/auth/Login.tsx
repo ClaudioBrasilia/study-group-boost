@@ -8,29 +8,50 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/components/ui/sonner';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import PageLayout from '@/components/layout/PageLayout';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
-interface LoginFormValues {
-  email: string;
-  password: string;
-}
+// Define validation schema
+const loginSchema = z.object({
+  email: z.string()
+    .email('Digite um email válido')
+    .min(1, 'Email é obrigatório'),
+  password: z.string()
+    .min(6, 'A senha deve ter pelo menos 6 caracteres')
+    .max(50, 'A senha não pode ter mais de 50 caracteres')
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>();
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  });
   
   const onSubmit = async (data: LoginFormValues) => {
     try {
       setIsLoading(true);
+      setLoginError(null);
       await login(data.email, data.password);
-      toast.success('Login successful');
+      toast.success('Login realizado com sucesso');
       navigate('/groups');
     } catch (error) {
-      toast.error('Login failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      setLoginError((error instanceof Error) ? error.message : 'Ocorreu um erro ao fazer login');
+      toast.error('Falha no login: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));
     } finally {
       setIsLoading(false);
     }
@@ -44,50 +65,66 @@ const Login: React.FC = () => {
             <h1 className="text-2xl font-bold text-study-primary">{t('login.title')}</h1>
           </div>
           
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('login.email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                {...register('email', { 
-                  required: 'Email is required',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Invalid email address'
-                  }
-                })}
+          {loginError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{loginError}</AlertDescription>
+            </Alert>
+          )}
+          
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('login.email')}</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="email" 
+                        placeholder="seu@email.com" 
+                        autoComplete="email"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">{t('login.password')}</Label>
-                <Link to="/forgot-password" className="text-xs text-study-primary hover:underline">
-                  {t('login.forgotPassword')}
-                </Link>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                {...register('password', { required: 'Password is required' })}
+              
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>{t('login.password')}</FormLabel>
+                      <Link to="/forgot-password" className="text-xs text-study-primary hover:underline">
+                        {t('login.forgotPassword')}
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <Input 
+                        type="password" 
+                        autoComplete="current-password"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-            
-            <Button
-              type="submit"
-              className="w-full bg-study-primary"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Loading...' : t('login.loginButton')}
-            </Button>
-          </form>
+              
+              <Button
+                type="submit"
+                className="w-full bg-study-primary"
+                disabled={isLoading}
+              >
+                {isLoading ? 'Carregando...' : t('login.loginButton')}
+              </Button>
+            </form>
+          </Form>
           
           <div className="text-center text-sm">
             <p>
@@ -95,6 +132,17 @@ const Login: React.FC = () => {
               <Link to="/register" className="text-study-primary hover:underline">
                 {t('login.registerButton')}
               </Link>
+            </p>
+          </div>
+          
+          <div className="text-center text-xs text-gray-500 pt-6 space-y-1">
+            <p>
+              Ao continuar, você concorda com nossos
+            </p>
+            <p>
+              <Link to="/terms" className="text-study-primary hover:underline">Termos de Uso</Link>
+              {' '}&amp;{' '}
+              <Link to="/privacy" className="text-study-primary hover:underline">Política de Privacidade</Link>
             </p>
           </div>
         </div>

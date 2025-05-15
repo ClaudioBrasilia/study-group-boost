@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, User, Users, Crown } from 'lucide-react';
+import { Plus, Search, User, Users, Crown, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import PageLayout from '@/components/layout/PageLayout';
@@ -10,6 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/sonner';
 import { Badge } from '@/components/ui/badge';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Group {
   id: string;
@@ -19,6 +23,18 @@ interface Group {
   isFixed?: boolean;
   isPremium?: boolean;
 }
+
+// Schema validation for group creation
+const createGroupSchema = z.object({
+  name: z.string()
+    .min(3, 'Nome do grupo deve ter pelo menos 3 caracteres')
+    .max(50, 'Nome do grupo não pode ter mais de 50 caracteres'),
+  description: z.string()
+    .max(200, 'Descrição não pode ter mais de 200 caracteres')
+    .optional()
+});
+
+type CreateGroupFormValues = z.infer<typeof createGroupSchema>;
 
 // Mock data for groups
 const MOCK_GROUPS: Group[] = [
@@ -38,41 +54,97 @@ const MOCK_GROUPS: Group[] = [
 
 const CreateGroupForm: React.FC<{ onCreateGroup: (name: string, description: string) => void }> = ({ onCreateGroup }) => {
   const { t } = useTranslation();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      onCreateGroup(name, description);
-      setName('');
-      setDescription('');
+  const form = useForm<CreateGroupFormValues>({
+    resolver: zodResolver(createGroupSchema),
+    defaultValues: {
+      name: '',
+      description: ''
+    }
+  });
+
+  const onSubmit = (data: CreateGroupFormValues) => {
+    setIsSubmitting(true);
+    setErrorMessage(null);
+    
+    try {
+      // Check for duplicate group name
+      const isDuplicate = MOCK_GROUPS.some(
+        group => group.name.toLowerCase() === data.name.toLowerCase()
+      );
+      
+      if (isDuplicate) {
+        setErrorMessage('Já existe um grupo com este nome');
+        setIsSubmitting(false);
+        return;
+      }
+      
+      onCreateGroup(data.name, data.description || '');
+    } catch (error) {
+      setErrorMessage('Erro ao criar grupo. Tente novamente.');
+      console.error('Error creating group:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="text-sm font-medium">Nome do Grupo</label>
-        <Input 
-          id="name" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          placeholder="Digite o nome do grupo" 
-          required
-        />
-      </div>
-      <div>
-        <label htmlFor="description" className="text-sm font-medium">Descrição (opcional)</label>
-        <Input 
-          id="description" 
-          value={description} 
-          onChange={(e) => setDescription(e.target.value)} 
-          placeholder="Descreva seu grupo de estudo"
-        />
-      </div>
-      <Button type="submit" className="w-full">Criar Grupo</Button>
-    </form>
+    <div className="space-y-4">
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+      
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome do Grupo</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Digite o nome do grupo" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Descrição (opcional)</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Descreva seu grupo de estudo" 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
+          <Button 
+            type="submit" 
+            className="w-full bg-study-primary"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Criando...' : 'Criar Grupo'}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
 
@@ -122,6 +194,7 @@ const Groups: React.FC = () => {
     
     // Navigate to the newly created group
     navigate(`/group/${newGroup.id}`);
+    toast.success('Grupo criado com sucesso!');
   };
 
   const handleGroupClick = (group: Group) => {
