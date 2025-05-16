@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Plus, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Subject, GoalType } from '@/types/groupTypes';
 import { useTranslation } from 'react-i18next';
+import { toast } from '@/components/ui/sonner';
 
 interface GroupGoalsTabProps {
   goals: GoalType[];
@@ -21,6 +22,7 @@ interface GroupGoalsTabProps {
   setNewGoalTarget: (value: string) => void;
   handleAddGoal: (e: React.FormEvent) => void;
   getSubjectNameById: (id: string) => string;
+  updateGoalProgress: (goalId: string, progress: number) => void;
 }
 
 const GroupGoalsTab: React.FC<GroupGoalsTabProps> = ({
@@ -34,9 +36,33 @@ const GroupGoalsTab: React.FC<GroupGoalsTabProps> = ({
   newGoalTarget,
   setNewGoalTarget,
   handleAddGoal,
-  getSubjectNameById
+  getSubjectNameById,
+  updateGoalProgress
 }) => {
   const { t } = useTranslation();
+  const [showProgressDialog, setShowProgressDialog] = useState(false);
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
+  const [progressAmount, setProgressAmount] = useState<string>('');
+
+  const handleUpdateProgress = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedGoalId || !progressAmount) return;
+    
+    const amount = parseInt(progressAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error(t('goals.invalidAmount'));
+      return;
+    }
+
+    updateGoalProgress(selectedGoalId, amount);
+    setProgressAmount('');
+    setShowProgressDialog(false);
+  };
+
+  const openProgressDialog = (goalId: string) => {
+    setSelectedGoalId(goalId);
+    setShowProgressDialog(true);
+  };
 
   return (
     <div className="space-y-4">
@@ -112,6 +138,32 @@ const GroupGoalsTab: React.FC<GroupGoalsTabProps> = ({
         )}
       </div>
       
+      {/* Progress Update Dialog */}
+      <Dialog open={showProgressDialog} onOpenChange={setShowProgressDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('goals.updateProgress')}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleUpdateProgress} className="space-y-4">
+            <div>
+              <Label htmlFor="progressAmount">{t('goals.enterAmount')}</Label>
+              <Input
+                id="progressAmount"
+                type="number"
+                min="1"
+                value={progressAmount}
+                onChange={(e) => setProgressAmount(e.target.value)}
+                placeholder={t('goals.enterAmountPlaceholder')}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full bg-study-primary">
+              {t('goals.saveProgress')}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
       {goals.length > 0 ? (
         <div className="space-y-4">
           {goals.map((goal) => (
@@ -140,7 +192,11 @@ const GroupGoalsTab: React.FC<GroupGoalsTabProps> = ({
                 </div>
                 
                 <div className="flex justify-end pt-2">
-                  <Button size="sm" variant="outline">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => openProgressDialog(goal.id)}
+                  >
                     {t('goals.updateProgress')}
                   </Button>
                 </div>

@@ -46,11 +46,13 @@ const GroupDetail: React.FC = () => {
     messageText,
     setMessageText,
     MOCK_MEMBERS,
+    userPoints,
     handleAddSubject,
     handleDeleteSubject,
     confirmDeleteSubject,
     handleAddVestibularModule,
     handleAddGoal,
+    updateGoalProgress,
     handleFileUpload,
     handleFileChange,
     handleSendMessage,
@@ -61,9 +63,16 @@ const GroupDetail: React.FC = () => {
   return (
     <PageLayout>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-study-primary">
-          {isVestibularGroup ? t('groups.fixedGroups.vestibularBrasil') : `Grupo ${groupId}`}
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-study-primary">
+            {isVestibularGroup ? t('groups.fixedGroups.vestibularBrasil') : `Grupo ${groupId}`}
+          </h1>
+          <div className="flex items-center">
+            <div className="bg-study-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+              {userPoints} pontos
+            </div>
+          </div>
+        </div>
         
         {isVestibularGroup && (
           <p className="text-gray-500 mt-1">
@@ -150,6 +159,7 @@ const GroupDetail: React.FC = () => {
             setNewGoalTarget={setNewGoalTarget}
             handleAddGoal={handleAddGoal}
             getSubjectNameById={getSubjectNameById}
+            updateGoalProgress={updateGoalProgress}
           />
         </TabsContent>
       </Tabs>

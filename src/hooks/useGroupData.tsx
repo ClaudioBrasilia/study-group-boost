@@ -40,6 +40,13 @@ const MOCK_GOALS = [
   { id: '2', subject: 'portuguese', type: 'pages' as const, target: 100, current: 75 },
 ];
 
+// Points configuration
+const POINTS_CONFIG = {
+  exercises: 5,  // 5 points per exercise
+  pages: 1,      // 1 point per page
+  time: 1        // 1 point per minute (already implemented in Timer.tsx)
+};
+
 export const useGroupData = (groupId: string | undefined) => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -63,6 +70,7 @@ export const useGroupData = (groupId: string | undefined) => {
     { id: '3', userId: '4', userName: 'Diana Pereira', text: 'Alguém tem material de revisão de matemática?', timestamp: new Date(Date.now() - 900000) },
   ]);
   const [messageText, setMessageText] = useState('');
+  const [userPoints, setUserPoints] = useState<number>(0);
 
   useEffect(() => {
     // Check if this is the fixed Vestibular Brasil group
@@ -85,7 +93,18 @@ export const useGroupData = (groupId: string | undefined) => {
       const isAdmin = MOCK_MEMBERS.some(member => member.id === user.id && member.isAdmin);
       setCurrentUserIsAdmin(isAdmin);
     }
+
+    // Load user points from localStorage
+    const savedPoints = localStorage.getItem('userPoints');
+    if (savedPoints) {
+      setUserPoints(parseInt(savedPoints));
+    }
   }, [groupId, i18n.language, t, user, subjects]);
+
+  // Save points to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('userPoints', userPoints.toString());
+  }, [userPoints]);
 
   const handleAddSubject = (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,6 +171,45 @@ export const useGroupData = (groupId: string | undefined) => {
     setNewGoalTarget('');
     
     toast.success('Meta adicionada com sucesso');
+  };
+
+  const updateGoalProgress = (goalId: string, progress: number) => {
+    const goalToUpdate = goals.find(g => g.id === goalId);
+    if (!goalToUpdate) return;
+    
+    // Calculate points based on the goal type and progress
+    let pointsEarned = 0;
+    if (goalToUpdate.type === 'exercises') {
+      pointsEarned = progress * POINTS_CONFIG.exercises;
+    } else if (goalToUpdate.type === 'pages') {
+      pointsEarned = progress * POINTS_CONFIG.pages;
+    } else if (goalToUpdate.type === 'time') {
+      pointsEarned = progress * POINTS_CONFIG.time;
+    }
+    
+    // Update the goal progress
+    const updatedGoals = goals.map(goal => {
+      if (goal.id === goalId) {
+        const newCurrent = Math.min(goal.current + progress, goal.target);
+        return { ...goal, current: newCurrent };
+      }
+      return goal;
+    });
+    
+    // Update goals and points
+    setGoals(updatedGoals);
+    setUserPoints(prevPoints => prevPoints + pointsEarned);
+    
+    const goalType = goalToUpdate.type === 'exercises' ? 'exercícios' : 
+                      goalToUpdate.type === 'pages' ? 'páginas' : 'minutos';
+    
+    toast.success(`Progresso atualizado! +${pointsEarned} pontos por ${progress} ${goalType}.`);
+    
+    // Check if goal is completed
+    const updatedGoal = updatedGoals.find(g => g.id === goalId);
+    if (updatedGoal && updatedGoal.current >= updatedGoal.target) {
+      toast.success(`🎉 Meta concluída! Parabéns!`, { duration: 5000 });
+    }
   };
 
   const handleFileUpload = () => {
@@ -231,11 +289,13 @@ export const useGroupData = (groupId: string | undefined) => {
     messageText,
     setMessageText,
     MOCK_MEMBERS,
+    userPoints,
     handleAddSubject,
     handleDeleteSubject,
     confirmDeleteSubject,
     handleAddVestibularModule,
     handleAddGoal,
+    updateGoalProgress,
     handleFileUpload,
     handleFileChange,
     handleSendMessage,
