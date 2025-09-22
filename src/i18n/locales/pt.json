@@ -222,6 +222,22 @@
     "weeklyReport": "Relatório Semanal",
     "progressSummary": "Resumo semanal do seu progresso",
     "logout": "Sair",
+    "achievementNames": {
+      "studyWarrior": "Guerreiro dos Estudos",
+      "knowledgeSeeker": "Buscador de Conhecimento", 
+      "groupLeader": "Líder de Grupo",
+      "problemSolver": "Solucionador de Problemas",
+      "hydrationMaster": "Mestre da Hidratação",
+      "dedicationStar": "Estrela da Dedicação"
+    },
+    "achievementDescriptions": {
+      "studyWarrior": "Complete 10 sessões de estudo",
+      "knowledgeSeeker": "Leia 100 páginas",
+      "groupLeader": "Crie um grupo de estudo", 
+      "problemSolver": "Complete 50 exercícios",
+      "hydrationMaster": "Monitore o consumo de água por 7 dias",
+      "dedicationStar": "Estude por 10 dias seguidos"
+    },
     "settings": {
       "profile": "Perfil",
       "security": "Segurança",

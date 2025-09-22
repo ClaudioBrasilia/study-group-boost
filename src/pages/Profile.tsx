@@ -20,12 +20,12 @@ const USER = {
   groups: 3,
   rank: 42,
   achievements: [
-    { id: '1', name: 'Study Warrior', description: 'Complete 10 study sessions', earned: true },
-    { id: '2', name: 'Knowledge Seeker', description: 'Read 100 pages', earned: true },
-    { id: '3', name: 'Group Leader', description: 'Create a study group', earned: true },
-    { id: '4', name: 'Problem Solver', description: 'Complete 50 exercises', earned: false },
-    { id: '5', name: 'Hydration Master', description: 'Track water intake for 7 days', earned: true },
-    { id: '6', name: 'Dedication Star', description: 'Study for 10 days in a row', earned: false },
+    { id: '1', nameKey: 'studyWarrior', descriptionKey: 'studyWarrior', earned: true },
+    { id: '2', nameKey: 'knowledgeSeeker', descriptionKey: 'knowledgeSeeker', earned: true },
+    { id: '3', nameKey: 'groupLeader', descriptionKey: 'groupLeader', earned: true },
+    { id: '4', nameKey: 'problemSolver', descriptionKey: 'problemSolver', earned: false },
+    { id: '5', nameKey: 'hydrationMaster', descriptionKey: 'hydrationMaster', earned: true },
+    { id: '6', nameKey: 'dedicationStar', descriptionKey: 'dedicationStar', earned: false },
   ]
 };
 
@@ -106,9 +106,9 @@ const Profile: React.FC = () => {
                 <div key={achievement.id} className="border rounded-lg p-3 bg-gray-50">
                   <div className="flex items-center mb-1">
                     <Award size={16} className="text-study-primary mr-2" />
-                    <span className="font-medium text-sm">{achievement.name}</span>
+                    <span className="font-medium text-sm">{t(`profile.achievementNames.${achievement.nameKey}`)}</span>
                   </div>
-                  <p className="text-xs text-gray-500">{achievement.description}</p>
+                  <p className="text-xs text-gray-500">{t(`profile.achievementDescriptions.${achievement.descriptionKey}`)}</p>
                 </div>
               ))}
             </div>
@@ -122,9 +122,9 @@ const Profile: React.FC = () => {
                   <div key={achievement.id} className="border rounded-lg p-3 bg-gray-50 opacity-60">
                     <div className="flex items-center mb-1">
                       <Award size={16} className="text-gray-400 mr-2" />
-                      <span className="font-medium text-sm">{achievement.name}</span>
+                      <span className="font-medium text-sm">{t(`profile.achievementNames.${achievement.nameKey}`)}</span>
                     </div>
-                    <p className="text-xs text-gray-500">{achievement.description}</p>
+                    <p className="text-xs text-gray-500">{t(`profile.achievementDescriptions.${achievement.descriptionKey}`)}</p>
                   </div>
                 ))}
               </div>
