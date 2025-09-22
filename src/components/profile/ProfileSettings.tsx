@@ -15,9 +15,11 @@ import {
 } from '@/components/ui/dialog';
 import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useTranslation } from 'react-i18next';
 
 const ProfileSettings: React.FC = () => {
   const { user, updateUserPlan } = useAuth();
+  const { t } = useTranslation();
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -32,7 +34,7 @@ const ProfileSettings: React.FC = () => {
     
     // Simulação de atualização de perfil
     setTimeout(() => {
-      toast.success('Perfil atualizado com sucesso');
+      toast.success(t('profile.settings.profileUpdated'));
       setIsUpdating(false);
     }, 1000);
   };
@@ -41,7 +43,7 @@ const ProfileSettings: React.FC = () => {
     e.preventDefault();
     
     if (newPassword !== confirmPassword) {
-      toast.error('As senhas não coincidem');
+      toast.error(t('profile.settings.passwordsNotMatch'));
       return;
     }
     
@@ -49,7 +51,7 @@ const ProfileSettings: React.FC = () => {
     
     // Simulação de alteração de senha
     setTimeout(() => {
-      toast.success('Senha alterada com sucesso');
+      toast.success(t('profile.settings.passwordChanged'));
       setPasswordDialogOpen(false);
       setCurrentPassword('');
       setNewPassword('');
@@ -62,15 +64,15 @@ const ProfileSettings: React.FC = () => {
     <div className="space-y-6">
       <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="profile">Perfil</TabsTrigger>
-          <TabsTrigger value="security">Segurança</TabsTrigger>
-          <TabsTrigger value="subscription">Assinatura</TabsTrigger>
+          <TabsTrigger value="profile">{t('profile.settings.profile')}</TabsTrigger>
+          <TabsTrigger value="security">{t('profile.settings.security')}</TabsTrigger>
+          <TabsTrigger value="subscription">{t('profile.settings.subscription')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="profile" className="space-y-4 pt-4">
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome</Label>
+              <Label htmlFor="name">{t('profile.settings.name')}</Label>
               <Input
                 id="name"
                 value={name}
@@ -80,7 +82,7 @@ const ProfileSettings: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('profile.settings.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -95,7 +97,7 @@ const ProfileSettings: React.FC = () => {
               className="w-full bg-study-primary"
               disabled={isUpdating}
             >
-              {isUpdating ? 'Atualizando...' : 'Atualizar Perfil'}
+              {isUpdating ? t('profile.settings.updating') : t('profile.settings.updateProfile')}
             </Button>
           </form>
         </TabsContent>
@@ -103,9 +105,9 @@ const ProfileSettings: React.FC = () => {
         <TabsContent value="security" className="space-y-4 pt-4">
           <div className="space-y-4">
             <div>
-              <h3 className="font-medium">Segurança da Conta</h3>
+              <h3 className="font-medium">{t('profile.settings.accountSecurity')}</h3>
               <p className="text-sm text-gray-500">
-                Gerencie as configurações de segurança da sua conta
+                {t('profile.settings.manageSecuritySettings')}
               </p>
             </div>
             
@@ -113,17 +115,17 @@ const ProfileSettings: React.FC = () => {
               variant="outline"
               onClick={() => setPasswordDialogOpen(true)}
             >
-              Alterar Senha
+              {t('profile.settings.changePassword')}
             </Button>
             
             <div className="pt-4">
-              <h3 className="font-medium">Privacidade</h3>
+              <h3 className="font-medium">{t('profile.settings.privacy')}</h3>
               <p className="text-sm text-gray-500">
-                Gerencie como suas informações são usadas
+                {t('profile.settings.managePrivacy')}
               </p>
               <div className="pt-2">
                 <Link to="/privacy" className="text-study-primary hover:underline text-sm">
-                  Ver Política de Privacidade
+                  {t('profile.settings.viewPrivacyPolicy')}
                 </Link>
               </div>
             </div>
@@ -133,21 +135,21 @@ const ProfileSettings: React.FC = () => {
         <TabsContent value="subscription" className="space-y-4 pt-4">
           <div className="space-y-4">
             <div>
-              <h3 className="font-medium">Seu Plano Atual</h3>
+              <h3 className="font-medium">{t('profile.settings.currentPlan')}</h3>
               <p className="text-sm mt-1 capitalize font-semibold text-study-primary">
-                {user?.plan === 'premium' ? 'Premium' : user?.plan === 'basic' ? 'Básico' : 'Gratuito'}
+                {user?.plan === 'premium' ? t('profile.settings.premium') : user?.plan === 'basic' ? t('profile.settings.basic') : t('profile.settings.free')}
               </p>
               
               {user?.plan !== 'premium' && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Faça o upgrade para o plano Premium para acessar todos os recursos
+                  {t('profile.settings.upgradeMessage')}
                 </p>
               )}
             </div>
             
             <Link to="/plans">
               <Button className="w-full bg-study-primary">
-                {user?.plan === 'premium' ? 'Gerenciar Assinatura' : 'Ver Planos'}
+                {user?.plan === 'premium' ? t('profile.settings.manageSubscription') : t('profile.settings.managePlans')}
               </Button>
             </Link>
           </div>
@@ -157,15 +159,15 @@ const ProfileSettings: React.FC = () => {
       <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Alterar Senha</DialogTitle>
+            <DialogTitle>{t('profile.settings.changePasswordTitle')}</DialogTitle>
             <DialogDescription>
-              Digite sua senha atual e a nova senha desejada.
+              {t('profile.settings.changePasswordDescription')}
             </DialogDescription>
           </DialogHeader>
           
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">Senha Atual</Label>
+              <Label htmlFor="currentPassword">{t('profile.settings.currentPassword')}</Label>
               <Input
                 id="currentPassword"
                 type="password"
@@ -176,7 +178,7 @@ const ProfileSettings: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="newPassword">Nova Senha</Label>
+              <Label htmlFor="newPassword">{t('profile.settings.newPassword')}</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -187,7 +189,7 @@ const ProfileSettings: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirme a Nova Senha</Label>
+              <Label htmlFor="confirmPassword">{t('profile.settings.confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -203,7 +205,7 @@ const ProfileSettings: React.FC = () => {
                 className="bg-study-primary"
                 disabled={isUpdating}
               >
-                {isUpdating ? 'Alterando...' : 'Alterar Senha'}
+                {isUpdating ? t('profile.settings.changing') : t('profile.settings.changePassword')}
               </Button>
             </DialogFooter>
           </form>
