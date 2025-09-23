@@ -21,6 +21,7 @@ import TestGenerator from "./pages/premium/TestGenerator";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import SplashScreen from "./components/SplashScreen";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import "./i18n";
 
 const queryClient = new QueryClient();
@@ -45,17 +46,17 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/plans" element={<Plans />} />
-            <Route path="/groups" element={<Groups />} />
-            <Route path="/group/:groupId" element={<GroupDetail />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/timer" element={<Timer />} />
-            <Route path="/water" element={<Water />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/generate-test" element={<TestGenerator />} />
             <Route path="/terms" element={<TermsOfUse />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
+            <Route path="/group/:groupId" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
+            <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
+            <Route path="/timer" element={<ProtectedRoute><Timer /></ProtectedRoute>} />
+            <Route path="/water" element={<ProtectedRoute><Water /></ProtectedRoute>} />
+            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
+            <Route path="/generate-test" element={<ProtectedRoute><TestGenerator /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

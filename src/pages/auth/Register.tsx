@@ -61,9 +61,17 @@ const Register: React.FC = () => {
     try {
       setIsLoading(true);
       setRegisterError(null);
-      await registerUser(data.name, data.email, data.password);
-      toast.success('Registro realizado com sucesso');
-      navigate('/groups');
+      
+      const { error } = await registerUser(data.name, data.email, data.password);
+      
+      if (error) {
+        setRegisterError(error.message);
+        toast.error('Falha no cadastro: ' + error.message);
+        return;
+      }
+      
+      toast.success('Cadastro realizado com sucesso! Verifique seu email para confirmar a conta.');
+      // Don't navigate immediately - user needs to verify email
     } catch (error) {
       setRegisterError((error instanceof Error) ? error.message : 'Ocorreu um erro ao registrar');
       toast.error('Falha no registro: ' + (error instanceof Error ? error.message : 'Erro desconhecido'));

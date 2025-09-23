@@ -46,7 +46,15 @@ const Login: React.FC = () => {
     try {
       setIsLoading(true);
       setLoginError(null);
-      await login(data.email, data.password);
+      
+      const { error } = await login(data.email, data.password);
+      
+      if (error) {
+        setLoginError(error.message);
+        toast.error('Falha no login: ' + error.message);
+        return;
+      }
+      
       toast.success('Login realizado com sucesso');
       navigate('/groups');
     } catch (error) {
