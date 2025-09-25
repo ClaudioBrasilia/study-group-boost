@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { Subject, GoalType, FileType, Message } from '@/types/groupTypes';
 import { toast } from '@/components/ui/sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 // Mock data
 const MOCK_SUBJECTS = [
@@ -50,11 +51,11 @@ const POINTS_CONFIG = {
 export const useGroupData = (groupId: string | undefined) => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const [subjects, setSubjects] = useState<Subject[]>(MOCK_SUBJECTS);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [newSubject, setNewSubject] = useState('');
   const [isVestibularGroup, setIsVestibularGroup] = useState(false);
-  const [files, setFiles] = useState<FileType[]>(MOCK_FILES);
-  const [goals, setGoals] = useState<GoalType[]>(MOCK_GOALS);
+  const [files, setFiles] = useState<FileType[]>([]);
+  const [goals, setGoals] = useState<GoalType[]>([]);
   const [newGoalSubject, setNewGoalSubject] = useState('');
   const [newGoalType, setNewGoalType] = useState<'exercises' | 'pages' | 'time'>('exercises');
   const [newGoalTarget, setNewGoalTarget] = useState('');
@@ -64,62 +65,168 @@ export const useGroupData = (groupId: string | undefined) => {
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
   const [addVestibularDialogOpen, setAddVestibularDialogOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', userId: '2', userName: 'Bruno Santos', text: 'Olá pessoal, como estão os estudos?', timestamp: new Date(Date.now() - 3600000) },
-    { id: '2', userId: '3', userName: 'Carlos Oliveira', text: 'Estou revisando física para a prova de amanhã.', timestamp: new Date(Date.now() - 1800000) },
-    { id: '3', userId: '4', userName: 'Diana Pereira', text: 'Alguém tem material de revisão de matemática?', timestamp: new Date(Date.now() - 900000) },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState('');
   const [userPoints, setUserPoints] = useState<number>(0);
+  const [members, setMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if this is the fixed Vestibular Brasil group
-    if (groupId === 'vestibular-brasil') {
-      setIsVestibularGroup(true);
-    }
+    if (!groupId || !user) return;
     
-    // Update subjects based on language
-    if (i18n.language) {
-      setSubjects(subjects.map(subj => ({
-        ...subj,
-        name: i18n.language === 'en' 
-          ? t(`groups.subjects.${subj.id}`)
-          : t(`groups.subjects.${subj.id}`)
-      })));
+    fetchGroupData();
+  }, [groupId, user]);
+
+  const fetchGroupData = async () => {
+    if (!groupId || !user) return;
+    
+    setLoading(true);
+    try {
+      // Check if this is the fixed Vestibular Brasil group
+      setIsVestibularGroup(groupId === 'vestibular-brasil');
+      
+      // Fetch group membership and admin status
+      const { data: membership } = await supabase
+        .from('group_members')
+        .select('is_admin')
+        .eq('group_id', groupId)
+        .eq('user_id', user.id)
+        .single();
+      
+      setCurrentUserIsAdmin(membership?.is_admin || false);
+      
+      // Fetch all group members
+      const { data: groupMembers } = await supabase
+        .from('group_members')
+        .select(`
+          user_id,
+          is_admin
+        `)
+        .eq('group_id', groupId);
+      
+      // Get profile names for members
+      const memberIds = groupMembers?.map(m => m.user_id) || [];
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .in('id', memberIds);
+      
+      const formattedMembers = groupMembers?.map(member => ({
+        id: member.user_id,
+        name: profilesData?.find(p => p.id === member.user_id)?.name || 'Unknown User',
+        isAdmin: member.is_admin
+      })) || [];
+      
+      setMembers(formattedMembers);
+      
+      // Fetch subjects
+      const { data: subjectsData } = await supabase
+        .from('subjects')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('name');
+      
+      const formattedSubjects = subjectsData?.map(subj => ({
+        id: subj.id,
+        name: subj.name
+      })) || [];
+      
+      setSubjects(formattedSubjects);
+      
+      // Fetch goals
+      const { data: goalsData } = await supabase
+        .from('goals')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('created_at');
+      
+      const formattedGoals = goalsData?.map(goal => ({
+        id: goal.id,
+        subject: goal.subject_id || '',
+        type: goal.type as 'exercises' | 'pages' | 'time',
+        target: goal.target,
+        current: goal.current
+      })) || [];
+      
+      setGoals(formattedGoals);
+      
+      // Fetch messages
+      const { data: messagesData } = await supabase
+        .from('messages')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id
+        `)
+        .eq('group_id', groupId)
+        .order('created_at');
+      
+      // Get profile names for message authors
+      const authorIds = messagesData?.map(m => m.user_id) || [];
+      const { data: authorProfiles } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .in('id', authorIds);
+      
+      const formattedMessages = messagesData?.map(msg => ({
+        id: msg.id,
+        userId: msg.user_id,
+        userName: authorProfiles?.find(p => p.id === msg.user_id)?.name || 'Unknown User',
+        text: msg.content,
+        timestamp: new Date(msg.created_at)
+      })) || [];
+      
+      setMessages(formattedMessages);
+      
+      // Fetch user points for this group
+      const { data: pointsData } = await supabase
+        .from('user_points')
+        .select('points')
+        .eq('group_id', groupId)
+        .eq('user_id', user.id)
+        .single();
+      
+      setUserPoints(pointsData?.points || 0);
+      
+    } catch (error) {
+      console.error('Error fetching group data:', error);
+      toast.error('Erro ao carregar dados do grupo');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Check if current user is an admin
-    if (user) {
-      const isAdmin = MOCK_MEMBERS.some(member => member.id === user.id && member.isAdmin);
-      setCurrentUserIsAdmin(isAdmin);
-    }
-
-    // Load user points from localStorage
-    const savedPoints = localStorage.getItem('userPoints');
-    if (savedPoints) {
-      setUserPoints(parseInt(savedPoints));
-    }
-  }, [groupId, i18n.language, t, user, subjects]);
-
-  // Save points to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('userPoints', userPoints.toString());
-  }, [userPoints]);
-
-  const handleAddSubject = (e: React.FormEvent) => {
+  const handleAddSubject = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newSubject.trim() || isVestibularGroup) return;
+    if (!newSubject.trim() || isVestibularGroup || !groupId || !user || !currentUserIsAdmin) return;
     
-    const newSubjectObj = {
-      id: newSubject.toLowerCase().replace(/\s+/g, '-'),
-      name: newSubject
-    };
-    
-    setSubjects([...subjects, newSubjectObj]);
-    setNewSubject('');
-    
-    toast.success('Matéria adicionada com sucesso');
+    try {
+      const { data, error } = await supabase
+        .from('subjects')
+        .insert({
+          name: newSubject,
+          group_id: groupId
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      const newSubjectObj = {
+        id: data.id,
+        name: data.name
+      };
+      
+      setSubjects([...subjects, newSubjectObj]);
+      setNewSubject('');
+      
+      toast.success('Matéria adicionada com sucesso');
+    } catch (error) {
+      console.error('Error adding subject:', error);
+      toast.error('Erro ao adicionar matéria');
+    }
   };
 
   const handleDeleteSubject = (subjectId: string) => {
@@ -129,53 +236,117 @@ export const useGroupData = (groupId: string | undefined) => {
     setDeleteConfirmOpen(true);
   };
 
-  const confirmDeleteSubject = () => {
-    if (!subjectToDelete) return;
+  const confirmDeleteSubject = async () => {
+    if (!subjectToDelete || !currentUserIsAdmin) return;
     
-    const updatedSubjects = subjects.filter(subject => subject.id !== subjectToDelete);
-    setSubjects(updatedSubjects);
-    setDeleteConfirmOpen(false);
-    setSubjectToDelete(null);
-    
-    toast.success('Matéria excluída com sucesso');
+    try {
+      const { error } = await supabase
+        .from('subjects')
+        .delete()
+        .eq('id', subjectToDelete);
+      
+      if (error) throw error;
+      
+      const updatedSubjects = subjects.filter(subject => subject.id !== subjectToDelete);
+      setSubjects(updatedSubjects);
+      setDeleteConfirmOpen(false);
+      setSubjectToDelete(null);
+      
+      toast.success('Matéria excluída com sucesso');
+    } catch (error) {
+      console.error('Error deleting subject:', error);
+      toast.error('Erro ao excluir matéria');
+    }
   };
 
-  const handleAddVestibularModule = () => {
-    if (isVestibularGroup) return;
+  const handleAddVestibularModule = async () => {
+    if (isVestibularGroup || !groupId || !user || !currentUserIsAdmin) return;
     
-    const existingIds = subjects.map(s => s.id);
-    const newVestibularSubjects = VESTIBULAR_SUBJECTS.filter(s => !existingIds.includes(s.id));
-    
-    setSubjects([...subjects, ...newVestibularSubjects]);
-    setAddVestibularDialogOpen(false);
-    
-    toast.success('Módulo Vestibular adicionado com sucesso');
+    try {
+      const vestibularSubjects = [
+        'Português', 'Matemática', 'História', 'Geografia', 'Física', 
+        'Química', 'Biologia', 'Literatura', 'Inglês', 'Redação'
+      ];
+      
+      const existingNames = subjects.map(s => s.name);
+      const newSubjects = vestibularSubjects.filter(name => !existingNames.includes(name));
+      
+      if (newSubjects.length === 0) {
+        toast.info('Todas as matérias do vestibular já foram adicionadas');
+        return;
+      }
+      
+      const subjectsToInsert = newSubjects.map(name => ({
+        name,
+        group_id: groupId
+      }));
+      
+      const { data, error } = await supabase
+        .from('subjects')
+        .insert(subjectsToInsert)
+        .select();
+      
+      if (error) throw error;
+      
+      const newSubjectObjs = data.map(subj => ({
+        id: subj.id,
+        name: subj.name
+      }));
+      
+      setSubjects([...subjects, ...newSubjectObjs]);
+      setAddVestibularDialogOpen(false);
+      
+      toast.success('Módulo Vestibular adicionado com sucesso');
+    } catch (error) {
+      console.error('Error adding vestibular module:', error);
+      toast.error('Erro ao adicionar módulo vestibular');
+    }
   };
 
-  const handleAddGoal = (e: React.FormEvent) => {
+  const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newGoalSubject || !newGoalType || !newGoalTarget) return;
+    if (!newGoalSubject || !newGoalType || !newGoalTarget || !groupId || !user) return;
     
-    const newGoal: GoalType = {
-      id: Date.now().toString(),
-      subject: newGoalSubject,
-      type: newGoalType,
-      target: parseInt(newGoalTarget),
-      current: 0
-    };
-    
-    setGoals([...goals, newGoal]);
-    setNewGoalSubject('');
-    setNewGoalType('exercises');
-    setNewGoalTarget('');
-    
-    toast.success('Meta adicionada com sucesso');
+    try {
+      const { data, error } = await supabase
+        .from('goals')
+        .insert({
+          group_id: groupId,
+          subject_id: newGoalSubject,
+          type: newGoalType,
+          target: parseInt(newGoalTarget),
+          current: 0,
+          created_by: user.id
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      const newGoal: GoalType = {
+        id: data.id,
+        subject: data.subject_id || '',
+        type: data.type as 'exercises' | 'pages' | 'time',
+        target: data.target,
+        current: data.current
+      };
+      
+      setGoals([...goals, newGoal]);
+      setNewGoalSubject('');
+      setNewGoalType('exercises');
+      setNewGoalTarget('');
+      
+      toast.success('Meta adicionada com sucesso');
+    } catch (error) {
+      console.error('Error adding goal:', error);
+      toast.error('Erro ao adicionar meta');
+    }
   };
 
-  const updateGoalProgress = (goalId: string, progress: number) => {
+  const updateGoalProgress = async (goalId: string, progress: number) => {
     const goalToUpdate = goals.find(g => g.id === goalId);
-    if (!goalToUpdate) return;
+    if (!goalToUpdate || !groupId || !user) return;
     
     // Calculate points based on the goal type and progress
     let pointsEarned = 0;
@@ -187,28 +358,52 @@ export const useGroupData = (groupId: string | undefined) => {
       pointsEarned = progress * POINTS_CONFIG.time;
     }
     
-    // Update the goal progress
-    const updatedGoals = goals.map(goal => {
-      if (goal.id === goalId) {
-        const newCurrent = Math.min(goal.current + progress, goal.target);
-        return { ...goal, current: newCurrent };
+    const newCurrent = Math.min(goalToUpdate.current + progress, goalToUpdate.target);
+    const newPoints = userPoints + pointsEarned;
+    
+    try {
+      // Update goal progress
+      const { error: goalError } = await supabase
+        .from('goals')
+        .update({ current: newCurrent })
+        .eq('id', goalId);
+      
+      if (goalError) throw goalError;
+      
+      // Update user points
+      const { error: pointsError } = await supabase
+        .from('user_points')
+        .upsert({
+          user_id: user.id,
+          group_id: groupId,
+          points: newPoints
+        });
+      
+      if (pointsError) throw pointsError;
+      
+      // Update local state
+      const updatedGoals = goals.map(goal => {
+        if (goal.id === goalId) {
+          return { ...goal, current: newCurrent };
+        }
+        return goal;
+      });
+      
+      setGoals(updatedGoals);
+      setUserPoints(newPoints);
+      
+      const goalType = goalToUpdate.type === 'exercises' ? 'exercícios' : 
+                        goalToUpdate.type === 'pages' ? 'páginas' : 'minutos';
+      
+      toast.success(`Progresso atualizado! +${pointsEarned} pontos por ${progress} ${goalType}.`);
+      
+      // Check if goal is completed
+      if (newCurrent >= goalToUpdate.target) {
+        toast.success(`🎉 Meta concluída! Parabéns!`, { duration: 5000 });
       }
-      return goal;
-    });
-    
-    // Update goals and points
-    setGoals(updatedGoals);
-    setUserPoints(prevPoints => prevPoints + pointsEarned);
-    
-    const goalType = goalToUpdate.type === 'exercises' ? 'exercícios' : 
-                      goalToUpdate.type === 'pages' ? 'páginas' : 'minutos';
-    
-    toast.success(`Progresso atualizado! +${pointsEarned} pontos por ${progress} ${goalType}.`);
-    
-    // Check if goal is completed
-    const updatedGoal = updatedGoals.find(g => g.id === goalId);
-    if (updatedGoal && updatedGoal.current >= updatedGoal.target) {
-      toast.success(`🎉 Meta concluída! Parabéns!`, { duration: 5000 });
+    } catch (error) {
+      console.error('Error updating goal progress:', error);
+      toast.error('Erro ao atualizar progresso da meta');
     }
   };
 
@@ -236,21 +431,43 @@ export const useGroupData = (groupId: string | undefined) => {
     }
   };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!messageText.trim() || !user) return;
+    if (!messageText.trim() || !user || !groupId) return;
     
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      userId: user.id,
-      userName: user.name,
-      text: messageText,
-      timestamp: new Date()
-    };
-    
-    setMessages([...messages, newMessage]);
-    setMessageText('');
+    try {
+      const { data, error } = await supabase
+        .from('messages')
+        .insert({
+          group_id: groupId,
+          user_id: user.id,
+          content: messageText
+        })
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id
+        `)
+        .single();
+      
+      if (error) throw error;
+      
+      const newMessage: Message = {
+        id: data.id,
+        userId: data.user_id,
+        userName: user.name,
+        text: data.content,
+        timestamp: new Date(data.created_at)
+      };
+      
+      setMessages([...messages, newMessage]);
+      setMessageText('');
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Erro ao enviar mensagem');
+    }
   };
 
   const handleDownloadFile = (fileId: string) => {
@@ -288,7 +505,8 @@ export const useGroupData = (groupId: string | undefined) => {
     messages,
     messageText,
     setMessageText,
-    MOCK_MEMBERS,
+    members,
+    loading,
     userPoints,
     handleAddSubject,
     handleDeleteSubject,

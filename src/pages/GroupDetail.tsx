@@ -45,7 +45,7 @@ const GroupDetail: React.FC = () => {
     messages,
     messageText,
     setMessageText,
-    MOCK_MEMBERS,
+    members,
     userPoints,
     handleAddSubject,
     handleDeleteSubject,
@@ -120,7 +120,7 @@ const GroupDetail: React.FC = () => {
         
         <TabsContent value="members">
           <GroupMembersTab
-            members={MOCK_MEMBERS}
+            members={members}
           />
         </TabsContent>
         
