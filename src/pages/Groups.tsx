@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Search, User, Users, Crown, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
+import { useGroups } from '@/hooks/useGroups';
 import PageLayout from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,15 +15,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-
-interface Group {
-  id: string;
-  name: string;
-  members: number;
-  description: string;
-  isFixed?: boolean;
-  isPremium?: boolean;
-}
 
 // Schema validation for group creation
 const createGroupSchema = z.object({
@@ -36,23 +28,7 @@ const createGroupSchema = z.object({
 
 type CreateGroupFormValues = z.infer<typeof createGroupSchema>;
 
-// Mock data for groups
-const MOCK_GROUPS: Group[] = [
-  { 
-    id: 'vestibular-brasil', 
-    name: 'Vestibular Brasil', 
-    members: 120, 
-    description: 'Grupo oficial para estudantes se preparando para vestibulares brasileiros', 
-    isFixed: true,
-    isPremium: true  // Marcando o grupo como premium
-  },
-  { id: '1', name: 'Math Masters', members: 8, description: 'Algebra and calculus study group' },
-  { id: '2', name: 'Physics Club', members: 5, description: 'For physics enthusiasts' },
-  { id: '3', name: 'Literature Circle', members: 12, description: 'Classic literature discussions' },
-  { id: '4', name: 'Chemistry Lab', members: 6, description: 'Chemistry theory and practice' },
-];
-
-const CreateGroupForm: React.FC<{ onCreateGroup: (name: string, description: string) => void }> = ({ onCreateGroup }) => {
+const CreateGroupForm: React.FC<{ onCreateGroup: (name: string, description: string) => Promise<void> }> = ({ onCreateGroup }) => {
   const { t } = useTranslation();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,26 +41,15 @@ const CreateGroupForm: React.FC<{ onCreateGroup: (name: string, description: str
     }
   });
 
-  const onSubmit = (data: CreateGroupFormValues) => {
+  const onSubmit = async (data: CreateGroupFormValues) => {
     setIsSubmitting(true);
     setErrorMessage(null);
     
     try {
-      // Check for duplicate group name
-      const isDuplicate = MOCK_GROUPS.some(
-        group => group.name.toLowerCase() === data.name.toLowerCase()
-      );
-      
-      if (isDuplicate) {
-        setErrorMessage('Já existe um grupo com este nome');
-        setIsSubmitting(false);
-        return;
-      }
-      
-      onCreateGroup(data.name, data.description || '');
-    } catch (error) {
-      setErrorMessage('Erro ao criar grupo. Tente novamente.');
-      console.error('Error creating group:', error);
+      await onCreateGroup(data.name, data.description || '');
+      form.reset();
+    } catch (error: any) {
+      setErrorMessage(error.message || 'Erro ao criar grupo. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -152,57 +117,48 @@ const Groups: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [groups, setGroups] = useState<Group[]>(MOCK_GROUPS);
+  const { groups, loading, createGroup, joinGroup } = useGroups();
   const [searchTerm, setSearchTerm] = useState('');
   const [open, setOpen] = useState(false);
 
-  // Update group names based on language
-  useEffect(() => {
-    if (i18n.language) {
-      setGroups(prevGroups => 
-        prevGroups.map(group => {
-          if (group.isFixed) {
-            return {
-              ...group,
-              name: t('groups.fixedGroups.vestibularBrasil')
-            };
-          }
-          return group;
-        })
-      );
-    }
-  }, [i18n.language, t]);
-
-  const handleCreateGroup = (name: string, description: string) => {
-    // Free users can only join groups, not create them
-    if (user && user.plan === 'free') {
-      toast.error('Criar grupos requer uma assinatura paga');
+  const handleCreateGroup = async (name: string, description: string) => {
+    const result = await createGroup(name, description);
+    
+    if (result.success) {
       setOpen(false);
+      navigate(`/group/${result.groupId}`);
+      toast.success('Grupo criado com sucesso!');
+    } else {
+      if (result.error === 'Criar grupos requer uma assinatura paga') {
+        setOpen(false);
+        navigate('/plans');
+        toast.error(result.error);
+      } else {
+        throw new Error(result.error);
+      }
+    }
+  };
+
+  const handleGroupClick = async (group: any) => {
+    // Check if user has premium access for premium groups
+    if (group.isPremium && user?.plan !== 'premium') {
+      toast.error('Este é um grupo exclusivo para usuários Premium');
       navigate('/plans');
       return;
     }
     
-    const newGroup = {
-      id: String(groups.length + 1),
-      name,
-      description,
-      members: 1, // The creator
-    };
-    
-    setGroups([...groups, newGroup]);
-    setOpen(false);
-    
-    // Navigate to the newly created group
-    navigate(`/group/${newGroup.id}`);
-    toast.success('Grupo criado com sucesso!');
-  };
-
-  const handleGroupClick = (group: Group) => {
-    // Verificar se o grupo é premium e se o usuário tem acesso
-    if (group.isPremium && user?.plan !== 'premium') {
-      toast.error('Este é um grupo exclusivo para usuários Premium');
-      navigate('/plans'); // Redireciona para a página de planos
-      return;
+    // If user is not a member, join the group first
+    if (!group.isMember && group.id !== 'vestibular-brasil') {
+      const result = await joinGroup(group.id);
+      if (result.success) {
+        toast.success('Você entrou no grupo!');
+      } else {
+        toast.error(result.error);
+        return;
+      }
+    } else if (group.id === 'vestibular-brasil' && !group.isMember) {
+      // Special case for vestibular group - just navigate without joining
+      // (it's a special fixed group)
     }
     
     navigate(`/group/${group.id}`);
@@ -212,6 +168,19 @@ const Groups: React.FC = () => {
     group.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     group.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <PageLayout>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-study-primary mx-auto mb-2"></div>
+            <p className="text-gray-500">Carregando grupos...</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>
@@ -262,6 +231,9 @@ const Groups: React.FC = () => {
                   )}
                   {group.isPremium && (
                     <Badge className="bg-yellow-500">Premium</Badge>
+                  )}
+                  {group.isMember && (
+                    <Badge variant="secondary">Membro</Badge>
                   )}
                 </div>
               </div>

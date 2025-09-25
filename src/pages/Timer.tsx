@@ -7,35 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/context/AuthContext';
+import { useStudySessions } from '@/hooks/useStudySessions';
 import { toast } from '@/components/ui/sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-// Mock data for subjects and groups
-const mockSubjects = [
-  { id: 'portuguese', name: 'Português' },
-  { id: 'math', name: 'Matemática' },
-  { id: 'history', name: 'História' },
-  { id: 'geography', name: 'Geografia' },
-  { id: 'physics', name: 'Física' },
-  { id: 'chemistry', name: 'Química' },
-  { id: 'biology', name: 'Biologia' },
-];
-
-const mockGroups = [
-  { id: 'vestibular-brasil', name: 'Vestibular Brasil' },
-  { id: '1', name: 'Grupo de Estudo 1' },
-  { id: '2', name: 'Grupo de Estudo 2' },
-];
-
-interface StudySession {
-  id: string;
-  subject: string;
-  group: string;
-  duration: number;
-  points: number;
-  date: Date;
-}
 
 // Points per minute of study
 const POINTS_PER_MINUTE = 1;
@@ -46,29 +21,19 @@ const TIMER_STATE_KEY = 'studyBoostTimerState';
 const Timer: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { studySessions, subjects, groups, loading, createStudySession, getSubjectsByGroup } = useStudySessions();
   
   // Timer state
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
-  const [studySessions, setStudySessions] = useState<StudySession[]>([]);
   
   // Refs for interval management
   const intervalRef = useRef<number | null>(null);
 
-  // Load saved sessions and timer state from localStorage on component mount
+  // Load timer state from localStorage on component mount
   useEffect(() => {
-    const savedSessions = localStorage.getItem('studySessions');
-    if (savedSessions) {
-      const parsedSessions = JSON.parse(savedSessions).map((session: any) => ({
-        ...session,
-        date: new Date(session.date)
-      }));
-      setStudySessions(parsedSessions);
-    }
-    
-    // Load timer state if it exists
     const savedTimerState = localStorage.getItem(TIMER_STATE_KEY);
     if (savedTimerState) {
       const { seconds: savedSeconds, isRunning: wasRunning, selectedSubject: savedSubject, selectedGroup: savedGroup } = JSON.parse(savedTimerState);
@@ -82,13 +47,6 @@ const Timer: React.FC = () => {
       }
     }
   }, []);
-  
-  // Save sessions to localStorage when they change
-  useEffect(() => {
-    if (studySessions.length > 0) {
-      localStorage.setItem('studySessions', JSON.stringify(studySessions));
-    }
-  }, [studySessions]);
   
   // Save timer state to localStorage whenever it changes
   useEffect(() => {
@@ -163,7 +121,7 @@ const Timer: React.FC = () => {
     }
   };
   
-  const handleStop = () => {
+  const handleStop = async () => {
     if (seconds < 60) {
       toast.error('Estude por pelo menos 1 minuto para registrar a sessão');
       return;
@@ -171,33 +129,36 @@ const Timer: React.FC = () => {
     
     setIsRunning(false);
     
-    // Find subject and group names
-    const subject = mockSubjects.find(s => s.id === selectedSubject)?.name || selectedSubject;
-    const group = mockGroups.find(g => g.id === selectedGroup)?.name || selectedGroup;
+    const result = await createStudySession(selectedSubject, seconds);
     
-    const points = calculatePoints(seconds);
-    
-    const newSession: StudySession = {
-      id: Date.now().toString(),
-      subject,
-      group,
-      duration: seconds,
-      points,
-      date: new Date(),
-    };
-    
-    setStudySessions([newSession, ...studySessions]);
-    
-    // Remover o estado do cronômetro do localStorage após finalizar a sessão
-    localStorage.removeItem(TIMER_STATE_KEY);
-    
-    // In a real app, you would update the user's points in the backend
-    toast.success(`Sessão de estudo concluída! Você ganhou ${points} pontos!`);
-    
-    // Reset timer
-    setSeconds(0);
+    if (result.success) {
+      // Remove timer state from localStorage after finishing session
+      localStorage.removeItem(TIMER_STATE_KEY);
+      
+      toast.success(`Sessão de estudo concluída! Você ganhou ${result.points} pontos!`);
+      
+      // Reset timer
+      setSeconds(0);
+    } else {
+      toast.error(result.error || 'Erro ao salvar sessão de estudo');
+    }
   };
   
+  const availableSubjects = selectedGroup ? getSubjectsByGroup(selectedGroup) : subjects;
+
+  if (loading) {
+    return (
+      <PageLayout>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-study-primary mx-auto mb-2"></div>
+            <p className="text-gray-500">Carregando...</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout>
       <h1 className="text-2xl font-bold mb-6">{t('timer.title')}</h1>
@@ -221,19 +182,22 @@ const Timer: React.FC = () => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">{t('timer.selectSubject')}</label>
+                <label className="block text-sm font-medium mb-2">{t('timer.selectGroup')}</label>
                 <Select
-                  value={selectedSubject}
-                  onValueChange={setSelectedSubject}
+                  value={selectedGroup}
+                  onValueChange={(value) => {
+                    setSelectedGroup(value);
+                    setSelectedSubject(''); // Reset subject when group changes
+                  }}
                   disabled={isRunning}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t('timer.selectSubject')} />
+                    <SelectValue placeholder={t('timer.selectGroup')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockSubjects.map(subject => (
-                      <SelectItem key={subject.id} value={subject.id}>
-                        {subject.name}
+                    {groups.map(group => (
+                      <SelectItem key={group.id} value={group.id}>
+                        {group.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -241,19 +205,20 @@ const Timer: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">{t('timer.selectGroup')}</label>
+                <label className="block text-sm font-medium mb-2">{t('timer.selectSubject')}</label>
                 <Select
-                  value={selectedGroup}
-                  onValueChange={setSelectedGroup}
-                  disabled={isRunning}
+                  value={selectedSubject}
+                  onValueChange={setSelectedSubject}
+                  disabled={isRunning || !selectedGroup}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t('timer.selectGroup')} />
+                    <SelectValue placeholder={t('timer.selectSubject')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {mockGroups.map(group => (
-                      <SelectItem key={group.id} value={group.id}>
-                        {group.name}
+                    <SelectItem value="">Estudo Geral</SelectItem>
+                    {availableSubjects.map(subject => (
+                      <SelectItem key={subject.id} value={subject.id}>
+                        {subject.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -299,7 +264,6 @@ const Timer: React.FC = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead>{t('timer.subject')}</TableHead>
-                      <TableHead>{t('timer.group')}</TableHead>
                       <TableHead>{t('timer.duration')}</TableHead>
                       <TableHead>{t('timer.points')}</TableHead>
                       <TableHead>{t('timer.date')}</TableHead>
@@ -307,20 +271,19 @@ const Timer: React.FC = () => {
                   </TableHeader>
                   <TableBody>
                     {studySessions.map((session) => {
-                      const hours = Math.floor(session.duration / 3600);
-                      const minutes = Math.floor((session.duration % 3600) / 60);
+                      const hours = Math.floor(session.duration_minutes / 60);
+                      const minutes = session.duration_minutes % 60;
                       
                       return (
                         <TableRow key={session.id}>
-                          <TableCell>{session.subject}</TableCell>
-                          <TableCell>{session.group}</TableCell>
+                          <TableCell>{session.subject_name}</TableCell>
                           <TableCell>
                             {hours > 0 && `${hours}h `}
                             {minutes}m
                           </TableCell>
                           <TableCell>{session.points}</TableCell>
                           <TableCell>
-                            {session.date.toLocaleDateString()}
+                            {session.started_at.toLocaleDateString()}
                           </TableCell>
                         </TableRow>
                       );
