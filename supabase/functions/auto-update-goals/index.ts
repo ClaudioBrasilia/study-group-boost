@@ -84,7 +84,6 @@ serve(async (req) => {
         .from('goals')
         .select('*')
         .in('group_id', groupIds)
-        .lt('current', supabase.raw('target')) // Only incomplete goals
 
       if (goalsError) {
         console.error('Error fetching goals:', goalsError)
@@ -93,11 +92,14 @@ serve(async (req) => {
 
       if (!goals || goals.length === 0) continue
 
+      // Filter to only incomplete goals
+      const incompleteGoals = goals.filter(goal => goal.current < goal.target)
+
       // Process sessions and update matching goals
       for (const session of userSessionList) {
         const sessionDuration = session.duration_minutes
 
-        for (const goal of goals) {
+        for (const goal of incompleteGoals) {
           let shouldUpdate = false
           let progressToAdd = 0
 
@@ -170,7 +172,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in auto-update-goals:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
