@@ -151,5 +151,50 @@
     "title": "Language",
     "english": "English",
     "portuguese": "Portuguese"
+  },
+  "progress": {
+    "title": "Progress",
+    "pagesRead": "Pages Read",
+    "studyTime": "Study Time",
+    "exercises": "Exercises",
+    "studyStreak": "Study Streak",
+    "minutes": "min",
+    "days": "days",
+    "studyTimeByDay": "Study Time by Day",
+    "pagesReadByDay": "Pages Read by Day",
+    "studyBySubject": "Study by Subject"
+  },
+  "timer": {
+    "title": "Timer",
+    "timeElapsed": "Time Elapsed",
+    "points": "points",
+    "pointsPerMinute": "point per minute",
+    "selectGroup": "Select Group",
+    "selectSubject": "Select Subject", 
+    "start": "Start",
+    "resume": "Resume",
+    "pause": "Pause",
+    "stop": "Stop",
+    "reset": "Reset",
+    "history": "Study History",
+    "subject": "Subject",
+    "duration": "Duration",
+    "date": "Date",
+    "noSessions": "No study sessions yet"
+  },
+  "group": {
+    "members": "Group Members",
+    "inviteMember": "Invite Member",
+    "admin": "Admin",
+    "addSubject": "Add Subject"
+  },
+  "days": {
+    "mon": "Mon",
+    "tue": "Tue", 
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
   }
 }

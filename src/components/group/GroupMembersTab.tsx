@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Member } from '@/types/groupTypes';
 import { useTranslation } from 'react-i18next';
+import { toast } from '@/components/ui/sonner';
 
 interface GroupMembersTabProps {
   members: Member[];
@@ -16,8 +17,13 @@ const GroupMembersTab: React.FC<GroupMembersTabProps> = ({ members }) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="font-semibold">Membros do Grupo ({members.length})</h3>
-        <Button size="sm" className="bg-study-primary">Convidar Membro</Button>
+        <h3 className="font-semibold">{t('group.members')} ({members.length})</h3>
+        <Button size="sm" className="bg-study-primary" onClick={() => {
+          // TODO: Implement invite functionality
+          toast.info('Funcionalidade de convite em desenvolvimento');
+        }}>
+          {t('group.inviteMember')}
+        </Button>
       </div>
       
       <div className="space-y-3">
@@ -31,7 +37,7 @@ const GroupMembersTab: React.FC<GroupMembersTabProps> = ({ members }) => {
             </div>
             
             {member.isAdmin && (
-              <Badge>Admin</Badge>
+              <Badge>{t('group.admin')}</Badge>
             )}
           </div>
         ))}

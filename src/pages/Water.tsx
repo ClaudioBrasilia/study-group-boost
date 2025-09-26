@@ -9,23 +9,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useTranslation } from 'react-i18next';
 
-// Mock data for water intake history
-const weeklyWaterData = [
-  { name: 'Seg', intake: 1800 },
-  { name: 'Ter', intake: 2200 },
-  { name: 'Qua', intake: 1600 },
-  { name: 'Qui', intake: 2000 },
-  { name: 'Sex', intake: 2500 },
-  { name: 'Sáb', intake: 1900 },
-  { name: 'Dom', intake: 2300 },
-];
-
 const Water: React.FC = () => {
   const { t } = useTranslation();
   const [waterIntake, setWaterIntake] = useState(1200); // in ml
   const [cupSize, setCupSize] = useState(250); // in ml
   const [unitType, setUnitType] = useState('ml');
   const dailyGoal = 2500; // in ml
+
+  // Mock data for water intake history - using translation keys for day names
+  const weeklyWaterData = [
+    { name: t('days.mon'), intake: 1800 },
+    { name: t('days.tue'), intake: 2200 },
+    { name: t('days.wed'), intake: 1600 },
+    { name: t('days.thu'), intake: 2000 },
+    { name: t('days.fri'), intake: 2500 },
+    { name: t('days.sat'), intake: 1900 },
+    { name: t('days.sun'), intake: 2300 },
+  ];
+
   
   const handleAddWater = (amount: number) => {
     setWaterIntake(prev => Math.min(prev + amount, 5000)); // Cap at 5000ml

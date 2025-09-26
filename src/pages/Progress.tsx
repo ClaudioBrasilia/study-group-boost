@@ -8,16 +8,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 
-// Mock data for study stats
-const weeklyData = [
-  { name: 'Seg', pages: 23, time: 45, exercises: 5 },
-  { name: 'Ter', pages: 15, time: 30, exercises: 8 },
-  { name: 'Qua', pages: 30, time: 60, exercises: 12 },
-  { name: 'Qui', pages: 27, time: 50, exercises: 10 },
-  { name: 'Sex', pages: 18, time: 40, exercises: 7 },
-  { name: 'Sáb', pages: 35, time: 75, exercises: 15 },
-  { name: 'Dom', pages: 20, time: 55, exercises: 9 },
-];
+const Progress: React.FC = () => {
+  const [timeRange, setTimeRange] = useState('week');
+  const { t } = useTranslation();
+
+  // Mock data for study stats - using translation keys for day names
+  const weeklyData = [
+    { name: t('days.mon'), pages: 23, time: 45, exercises: 5 },
+    { name: t('days.tue'), pages: 15, time: 30, exercises: 8 },
+    { name: t('days.wed'), pages: 30, time: 60, exercises: 12 },
+    { name: t('days.thu'), pages: 27, time: 50, exercises: 10 },
+    { name: t('days.fri'), pages: 18, time: 40, exercises: 7 },
+    { name: t('days.sat'), pages: 35, time: 75, exercises: 15 },
+    { name: t('days.sun'), pages: 20, time: 55, exercises: 9 },
+  ];
 
 const subjectData = [
   { name: 'Matemática', value: 35 },
@@ -29,9 +33,6 @@ const subjectData = [
 
 const COLORS = ['#9b87f5', '#7E69AB', '#33C3F0', '#4CAF50', '#FFC107'];
 
-const Progress: React.FC = () => {
-  const [timeRange, setTimeRange] = useState('week');
-  const { t } = useTranslation();
 
   // Calculate total stats
   const totalPages = weeklyData.reduce((sum, day) => sum + day.pages, 0);
