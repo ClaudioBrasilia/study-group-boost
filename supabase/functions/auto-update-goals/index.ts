@@ -6,54 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface Database {
-  public: {
-    Tables: {
-      goals: {
-        Row: {
-          id: string
-          group_id: string
-          subject_id: string | null
-          type: string
-          target: number
-          current: number
-          created_by: string
-          created_at: string
-          updated_at: string
-        }
-      }
-      study_sessions: {
-        Row: {
-          id: string
-          user_id: string
-          subject_id: string | null
-          duration_minutes: number
-          started_at: string
-          completed_at: string | null
-        }
-      }
-      user_points: {
-        Row: {
-          id: string
-          user_id: string
-          group_id: string
-          points: number
-          updated_at: string
-        }
-      }
-      group_members: {
-        Row: {
-          id: string
-          group_id: string
-          user_id: string
-          is_admin: boolean
-          joined_at: string
-        }
-      }
-    }
-  }
-}
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -61,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient<Database>(
+    const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
@@ -98,7 +50,7 @@ serve(async (req) => {
     }
 
     // Group sessions by user and get their groups
-    const userSessions = new Map<string, typeof sessions>()
+    const userSessions = new Map<string, any[]>()
     sessions.forEach(session => {
       const userId = session.user_id
       if (!userSessions.has(userId)) {
@@ -132,7 +84,7 @@ serve(async (req) => {
         .from('goals')
         .select('*')
         .in('group_id', groupIds)
-        .lt('current', 'target') // Only incomplete goals
+        .lt('current', supabase.raw('target')) // Only incomplete goals
 
       if (goalsError) {
         console.error('Error fetching goals:', goalsError)
@@ -185,9 +137,6 @@ serve(async (req) => {
                 group_id: goal.group_id,
                 points: points,
                 updated_at: new Date().toISOString()
-              }, {
-                onConflict: 'user_id,group_id',
-                ignoreDuplicates: false
               })
 
             if (pointsError) {
