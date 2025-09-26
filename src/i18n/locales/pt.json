@@ -1,8 +1,7 @@
-
 {
   "app": {
     "name": "StudyBoost",
-    "slogan": "Alcance seus objetivos de estudo junto com amigos"
+    "slogan": "Alcance suas metas de estudo junto com seus amigos"
   },
   "loading": "Carregando...",
   "navigation": {
@@ -18,10 +17,10 @@
   },
   "groups": {
     "title": "Grupos de Estudo",
-    "search": "Procurar grupos...",
+    "search": "Buscar grupos...",
     "create": "Criar Novo Grupo de Estudo",
     "noGroups": "Nenhum grupo de estudo encontrado",
-    "createFirst": "Crie seu primeiro grupo",
+    "createFirst": "Criar Seu Primeiro Grupo",
     "members": "membros",
     "fixedGroups": {
       "vestibularBrasil": "Vestibular Brasil"
@@ -48,7 +47,7 @@
     "password": "Senha",
     "loginButton": "Entrar",
     "registerPrompt": "Não tem uma conta?",
-    "registerButton": "Registre-se aqui",
+    "registerButton": "Cadastre-se aqui",
     "forgotPassword": "Esqueceu a senha?"
   },
   "register": {
@@ -57,9 +56,9 @@
     "email": "Email",
     "password": "Senha",
     "confirmPassword": "Confirmar Senha",
-    "registerButton": "Registrar",
+    "registerButton": "Cadastrar",
     "loginPrompt": "Já tem uma conta?",
-    "loginButton": "Entre aqui"
+    "loginButton": "Faça login aqui"
   },
   "plans": {
     "title": "Escolha Seu Plano",
@@ -67,17 +66,17 @@
       "name": "Gratuito",
       "price": "Grátis",
       "features": [
-        "Entrar em grupos de estudo",
-        "Registros de atividades básicos",
-        "Monitor de água",
+        "Participar de grupos de estudo",
+        "Acompanhar atividades básicas",
+        "Controle de água",
         "Acesso limitado ao ranking"
       ]
     },
     "basic": {
       "name": "Básico",
-      "price": "R$9,90/mês",
+      "price": "R$ 19,90/mês",
       "features": [
-        "Todas as funções gratuitas",
+        "Todos os recursos gratuitos",
         "Sem anúncios",
         "Acompanhamento avançado de progresso",
         "Criação de grupos personalizados"
@@ -85,9 +84,9 @@
     },
     "premium": {
       "name": "Premium",
-      "price": "R$14,90/mês",
+      "price": "R$ 39,90/mês",
       "features": [
-        "Todas as funções básicas",
+        "Todos os recursos básicos",
         "Geração de testes com IA",
         "Grupos ilimitados",
         "Análises avançadas"
@@ -107,27 +106,27 @@
       "hard": "Difícil"
     },
     "generate": "Gerar Teste",
-    "premiumFeature": "Esta é uma funcionalidade premium",
-    "upgrade": "Faça upgrade para desbloquear",
+    "premiumFeature": "Este é um recurso premium",
+    "upgrade": "Fazer upgrade para desbloquear",
     "generatedTest": "Teste Gerado",
     "createAnother": "Criar Outro Teste",
     "saveTest": "Salvar Teste",
     "submitAnswers": "Enviar Respostas",
     "generating": "Gerando...",
-    "selectAtLeastOne": "Selecione pelo menos uma matéria",
+    "selectAtLeastOne": "Por favor, selecione pelo menos uma matéria",
     "generatingSuccess": "Teste gerado com sucesso!",
     "generatingFailed": "Falha ao gerar teste",
-    "apiKeyTitle": "Insira sua Chave da API OpenAI",
+    "apiKeyTitle": "Digite a Chave da API OpenAI",
     "apiKeyDescription": "Para gerar questões de teste, você precisa fornecer uma chave da API OpenAI",
-    "apiKeyPlaceholder": "Insira sua chave da API OpenAI",
+    "apiKeyPlaceholder": "Digite sua chave da API OpenAI",
     "saveApiKey": "Salvar e Continuar",
     "apiKeySaved": "Chave da API salva com sucesso",
-    "resetTimer": "Reiniciar cronômetro"
+    "resetTimer": "Cronômetro reiniciado"
   },
-  "groupMessages": {
-    "placeholder": "Digite uma mensagem...",
-    "send": "Enviar",
-    "messageHistory": "Histórico de Mensagens"
+  "chat": {
+    "sendMessage": "Enviar mensagem",
+    "placeholder": "Digite sua mensagem...",
+    "noMessages": "Nenhuma mensagem ainda. Comece a conversa!"
   },
   "language": {
     "title": "Idioma",
@@ -135,77 +134,68 @@
     "portuguese": "Português"
   },
   "settings": {
-    "title": "Configurações"
+    "title": "Configurações",
+    "profile": "Perfil",
+    "notifications": "Notificações",
+    "language": "Idioma",
+    "logout": "Sair"
   },
   "timer": {
     "title": "Cronômetro de Estudo",
     "start": "Iniciar",
     "pause": "Pausar",
-    "resume": "Continuar",
     "stop": "Parar",
     "reset": "Reiniciar",
-    "selectSubject": "Selecionar matéria",
-    "selectGroup": "Selecionar grupo",
-    "timeElapsed": "Tempo decorrido",
-    "earnedPoints": "Pontos ganhos",
-    "pointsPerMinute": "pontos por minuto",
-    "saveSession": "Salvar sessão",
-    "history": "Histórico",
-    "noSessions": "Nenhuma sessão registrada",
-    "session": "Sessão",
-    "date": "Data",
+    "resume": "Continuar",
+    "timeElapsed": "Tempo Decorrido",
+    "selectSubject": "Selecionar Matéria",
+    "selectGroup": "Selecionar Grupo",
+    "pointsPerMinute": "ponto por minuto",
+    "points": "pontos",
+    "history": "Histórico de Estudos",
+    "subject": "Matéria",
     "duration": "Duração",
-    "points": "Pontos",
-    "minutes": "minutos",
-    "seconds": "segundos",
-    "hours": "horas"
+    "date": "Data",
+    "noSessions": "Nenhuma sessão de estudo ainda"
   },
   "files": {
-    "title": "Arquivos",
-    "upload": "Enviar arquivo",
-    "noFiles": "Nenhum arquivo disponível",
-    "download": "Baixar",
-    "view": "Visualizar",
-    "delete": "Excluir",
-    "fileName": "Nome do arquivo",
-    "fileSize": "Tamanho",
-    "uploadedBy": "Enviado por",
-    "uploadedAt": "Data de envio",
-    "uploadSuccess": "Arquivo enviado com sucesso",
+    "title": "Arquivos do Grupo",
+    "upload": "Enviar Arquivo",
+    "noFiles": "Nenhum arquivo enviado ainda",
+    "uploadFirst": "Seja o primeiro a enviar um arquivo!",
+    "selectFile": "Selecionar arquivo",
+    "uploading": "Enviando...",
+    "uploadSuccess": "Arquivo enviado com sucesso!",
     "uploadError": "Erro ao enviar arquivo",
-    "deleteConfirm": "Tem certeza que deseja excluir este arquivo?",
-    "deleteSuccess": "Arquivo excluído com sucesso",
-    "permissionDenied": "Você não tem permissão para esta ação"
+    "download": "Baixar",
+    "delete": "Excluir",
+    "confirmDelete": "Tem certeza que deseja excluir este arquivo?",
+    "deleteSuccess": "Arquivo excluído com sucesso!",
+    "deleteError": "Erro ao excluir arquivo"
   },
   "goals": {
-    "title": "Metas",
+    "title": "Metas do Grupo",
     "addGoal": "Adicionar Meta",
-    "noGoals": "Nenhuma meta definida",
+    "noGoals": "Nenhuma meta definida ainda",
     "subject": "Matéria",
-    "type": "Tipo de meta",
-    "progress": "Progresso",
-    "target": "Objetivo",
+    "type": "Tipo",
+    "target": "Meta",
     "current": "Atual",
-    "types": {
-      "pages": "Páginas lidas",
-      "exercises": "Exercícios resolvidos",
-      "time": "Tempo de estudo (minutos)"
-    },
-    "createGoal": "Criar Meta",
-    "editGoal": "Editar Meta",
-    "deleteGoal": "Excluir Meta",
-    "selectSubject": "Selecione uma matéria",
-    "enterTarget": "Digite o objetivo",
-    "selectType": "Selecione o tipo de meta",
+    "progress": "Progresso",
     "updateProgress": "Atualizar Progresso",
-    "addProgress": "Adicionar Progresso"
+    "enterAmount": "Digite a quantidade",
+    "types": {
+      "exercises": "Exercícios",
+      "pages": "Páginas",
+      "time": "Tempo (minutos)"
+    }
   },
   "profile": {
     "title": "Perfil",
     "level": "Nível",
-    "scholar": "Estudante",
+    "scholar": "Estudioso",
     "points": "pontos",
-    "rank": "Classificação",
+    "rank": "Posição",
     "toNextLevel": "pontos para o próximo nível",
     "studyStats": "Estatísticas de Estudo",
     "myGroups": "Meus Grupos",
@@ -214,60 +204,23 @@
     "locked": "Bloqueadas",
     "notificationSettings": "Configurações de Notificação",
     "goalReminders": "Lembretes de Metas",
-    "dailyReminders": "Receber lembretes diários para suas metas",
+    "dailyReminders": "Receber lembretes diários de suas metas",
     "groupActivity": "Atividade do Grupo",
     "groupUpdates": "Atualizações dos seus grupos de estudo",
-    "achievementNotifications": "Notificações de Conquistas",
-    "achievementAlerts": "Notificações quando você ganha conquistas",
+    "achievementNotifications": "Conquistas",
+    "achievementAlerts": "Notificações quando você conquistar algo",
     "weeklyReport": "Relatório Semanal",
     "progressSummary": "Resumo semanal do seu progresso",
     "logout": "Sair",
-    "achievementNames": {
-      "studyWarrior": "Guerreiro dos Estudos",
-      "knowledgeSeeker": "Buscador de Conhecimento", 
-      "groupLeader": "Líder de Grupo",
-      "problemSolver": "Solucionador de Problemas",
-      "hydrationMaster": "Mestre da Hidratação",
-      "dedicationStar": "Estrela da Dedicação"
-    },
-    "achievementDescriptions": {
-      "studyWarrior": "Complete 10 sessões de estudo",
-      "knowledgeSeeker": "Leia 100 páginas",
-      "groupLeader": "Crie um grupo de estudo", 
-      "problemSolver": "Complete 50 exercícios",
-      "hydrationMaster": "Monitore o consumo de água por 7 dias",
-      "dedicationStar": "Estude por 10 dias seguidos"
-    },
     "settings": {
       "profile": "Perfil",
       "security": "Segurança",
       "subscription": "Assinatura",
       "name": "Nome",
       "email": "Email",
-      "updateProfile": "Atualizar Perfil",
-      "updating": "Atualizando...",
-      "profileUpdated": "Perfil atualizado com sucesso",
-      "changePassword": "Alterar Senha",
-      "accountSecurity": "Segurança da Conta",
-      "manageSecuritySettings": "Gerencie as configurações de segurança da sua conta",
-      "privacy": "Privacidade",
-      "managePrivacy": "Gerencie como suas informações são usadas",
-      "viewPrivacyPolicy": "Ver Política de Privacidade",
-      "currentPlan": "Seu Plano Atual",
-      "free": "Gratuito",
-      "basic": "Básico",
-      "premium": "Premium",
-      "upgradeMessage": "Faça o upgrade para o plano Premium para acessar todos os recursos",
-      "managePlans": "Ver Planos",
-      "manageSubscription": "Gerenciar Assinatura",
       "currentPassword": "Senha Atual",
       "newPassword": "Nova Senha",
-      "confirmPassword": "Confirme a Nova Senha",
-      "changing": "Alterando...",
-      "passwordChanged": "Senha alterada com sucesso",
-      "passwordsNotMatch": "As senhas não coincidem",
-      "changePasswordTitle": "Alterar Senha",
-      "changePasswordDescription": "Digite sua senha atual e a nova senha desejada."
+      "confirmPassword": "Confirmar Senha"
     }
   },
   "water": {
@@ -290,15 +243,30 @@
     "points": "pontos"
   },
   "progress": {
-    "title": "Meu Progresso",
+    "title": "Progresso",
     "pagesRead": "Páginas Lidas",
     "studyTime": "Tempo de Estudo",
     "exercises": "Exercícios",
-    "studyStreak": "Sequência de Estudo",
+    "studyStreak": "Sequência de Estudos",
+    "minutes": "min",
     "days": "dias",
     "studyTimeByDay": "Tempo de Estudo por Dia",
     "pagesReadByDay": "Páginas Lidas por Dia",
-    "studyBySubject": "Estudo por Matéria",
-    "minutes": "min"
+    "studyBySubject": "Estudo por Matéria"
+  },
+  "group": {
+    "members": "Membros do Grupo",
+    "inviteMember": "Convidar Membro",
+    "admin": "Admin",
+    "addSubject": "Adicionar Matéria"
+  },
+  "days": {
+    "mon": "Seg",
+    "tue": "Ter", 
+    "wed": "Qua",
+    "thu": "Qui",
+    "fri": "Sex",
+    "sat": "Sáb",
+    "sun": "Dom"
   }
 }
