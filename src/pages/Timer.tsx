@@ -215,7 +215,7 @@ const Timer: React.FC = () => {
                     <SelectValue placeholder={t('timer.selectSubject')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Estudo Geral</SelectItem>
+                    <SelectItem value="general">Estudo Geral</SelectItem>
                     {availableSubjects.map(subject => (
                       <SelectItem key={subject.id} value={subject.id}>
                         {subject.name}
