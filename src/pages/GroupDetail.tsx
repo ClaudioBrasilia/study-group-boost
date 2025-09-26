@@ -47,6 +47,7 @@ const GroupDetail: React.FC = () => {
     setMessageText,
     members,
     userPoints,
+    groupName,
     handleAddSubject,
     handleDeleteSubject,
     confirmDeleteSubject,
@@ -65,7 +66,7 @@ const GroupDetail: React.FC = () => {
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-study-primary">
-            {isVestibularGroup ? t('groups.fixedGroups.vestibularBrasil') : `Grupo ${groupId}`}
+            {isVestibularGroup ? t('groups.fixedGroups.vestibularBrasil') : (groupName || `Grupo ${groupId}`)}
           </h1>
           <div className="flex items-center">
             <div className="bg-study-primary text-white px-3 py-1 rounded-full text-sm font-medium">

@@ -70,6 +70,7 @@ export const useGroupData = (groupId: string | undefined) => {
   const [userPoints, setUserPoints] = useState<number>(0);
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [groupName, setGroupName] = useState<string>('');
 
   useEffect(() => {
     if (!groupId || !user) return;
@@ -120,6 +121,15 @@ export const useGroupData = (groupId: string | undefined) => {
     try {
       // Check if this is the fixed Vestibular Brasil group
       setIsVestibularGroup(groupId === 'vestibular-brasil');
+      
+      // Fetch group information
+      const { data: groupData } = await supabase
+        .from('groups')
+        .select('name, type')
+        .eq('id', groupId)
+        .single();
+      
+      setGroupName(groupData?.name || '');
       
       // Fetch group membership and admin status
       const { data: membership } = await supabase
@@ -544,6 +554,7 @@ export const useGroupData = (groupId: string | undefined) => {
     members,
     loading,
     userPoints,
+    groupName,
     handleAddSubject,
     handleDeleteSubject,
     confirmDeleteSubject,
