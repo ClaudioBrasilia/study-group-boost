@@ -135,15 +135,7 @@ const GroupDetail: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="files">
-          <GroupFilesTab
-            files={files}
-            uploadDialogOpen={uploadDialogOpen}
-            setUploadDialogOpen={setUploadDialogOpen}
-            handleFileChange={handleFileChange}
-            handleFileUpload={handleFileUpload}
-            handleDownloadFile={handleDownloadFile}
-            newFile={newFile}
-          />
+          <GroupFilesTab groupId={groupId} />
         </TabsContent>
 
         <TabsContent value="goals">
