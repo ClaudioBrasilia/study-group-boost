@@ -65,18 +65,18 @@ export const useGroups = () => {
           return {
             ...group,
             members: count || 0,
-            isFixed: group.id === 'vestibular-brasil',
-            isPremium: group.id === 'vestibular-brasil',
+            isFixed: group.id === 'b47ac10b-58cc-4372-a567-0e02b2c3d479',
+            isPremium: group.id === 'b47ac10b-58cc-4372-a567-0e02b2c3d479',
             isMember: !!membership
           };
         })
       );
 
       // Add the fixed Vestibular Brasil group if it doesn't exist
-      const hasVestibularGroup = groupsWithCounts.find(g => g.id === 'vestibular-brasil');
+      const hasVestibularGroup = groupsWithCounts.find(g => g.id === 'b47ac10b-58cc-4372-a567-0e02b2c3d479');
       if (!hasVestibularGroup) {
         groupsWithCounts.unshift({
-          id: 'vestibular-brasil',
+          id: 'b47ac10b-58cc-4372-a567-0e02b2c3d479',
           name: 'Vestibular Brasil',
           description: 'Grupo oficial para estudantes se preparando para vestibulares brasileiros',
           members: 120,
