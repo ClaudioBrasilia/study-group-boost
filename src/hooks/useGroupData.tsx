@@ -394,6 +394,12 @@ export const useGroupData = (groupId: string | undefined) => {
     const goalToUpdate = goals.find(g => g.id === goalId);
     if (!goalToUpdate || !groupId || !user) return;
     
+    // Validate progress input
+    if (progress <= 0) {
+      toast.error('O progresso deve ser maior que zero');
+      return;
+    }
+    
     // Calculate points based on the goal type and progress
     let pointsEarned = 0;
     if (goalToUpdate.type === 'exercises') {
@@ -405,16 +411,31 @@ export const useGroupData = (groupId: string | undefined) => {
     }
     
     const newCurrent = Math.min(goalToUpdate.current + progress, goalToUpdate.target);
-    const newPoints = userPoints + pointsEarned;
+    const actualProgress = newCurrent - goalToUpdate.current;
+    const actualPoints = Math.floor((actualProgress / progress) * pointsEarned);
     
     try {
-      // Update goal progress
+      // Update goal progress with timestamp
       const { error: goalError } = await supabase
         .from('goals')
-        .update({ current: newCurrent })
+        .update({ 
+          current: newCurrent,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', goalId);
       
       if (goalError) throw goalError;
+      
+      // Get current points and add new points
+      const { data: currentPointsData } = await supabase
+        .from('user_points')
+        .select('points')
+        .eq('user_id', user.id)
+        .eq('group_id', groupId)
+        .single();
+      
+      const currentPoints = currentPointsData?.points || 0;
+      const newTotalPoints = currentPoints + actualPoints;
       
       // Update user points
       const { error: pointsError } = await supabase
@@ -422,7 +443,10 @@ export const useGroupData = (groupId: string | undefined) => {
         .upsert({
           user_id: user.id,
           group_id: groupId,
-          points: newPoints
+          points: newTotalPoints,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,group_id'
         });
       
       if (pointsError) throw pointsError;
@@ -436,17 +460,23 @@ export const useGroupData = (groupId: string | undefined) => {
       });
       
       setGoals(updatedGoals);
-      setUserPoints(newPoints);
+      setUserPoints(newTotalPoints);
       
       const goalType = goalToUpdate.type === 'exercises' ? 'exercícios' : 
                         goalToUpdate.type === 'pages' ? 'páginas' : 'minutos';
       
-      toast.success(`Progresso atualizado! +${pointsEarned} pontos por ${progress} ${goalType}.`);
+      toast.success(`Progresso atualizado! +${actualPoints} pontos por ${actualProgress} ${goalType}.`);
       
       // Check if goal is completed
       if (newCurrent >= goalToUpdate.target) {
         toast.success(`🎉 Meta concluída! Parabéns!`, { duration: 5000 });
       }
+      
+      // Call automatic update function to sync with study sessions
+      if (goalToUpdate.type === 'time') {
+        await supabase.functions.invoke('auto-update-goals');
+      }
+      
     } catch (error) {
       console.error('Error updating goal progress:', error);
       toast.error('Erro ao atualizar progresso da meta');
@@ -483,12 +513,18 @@ export const useGroupData = (groupId: string | undefined) => {
     if (!messageText.trim() || !user || !groupId) return;
     
     try {
+      // Validate message length
+      if (messageText.length > 1000) {
+        toast.error('Mensagem muito longa. Máximo 1000 caracteres.');
+        return;
+      }
+      
       const { data, error } = await supabase
         .from('messages')
         .insert({
           group_id: groupId,
           user_id: user.id,
-          content: messageText
+          content: messageText.trim()
         })
         .select(`
           id,
@@ -500,16 +536,10 @@ export const useGroupData = (groupId: string | undefined) => {
       
       if (error) throw error;
       
-      const newMessage: Message = {
-        id: data.id,
-        userId: data.user_id,
-        userName: user.name,
-        text: data.content,
-        timestamp: new Date(data.created_at)
-      };
-      
-      setMessages([...messages, newMessage]);
+      // Don't add to local state since real-time subscription will handle it
       setMessageText('');
+      
+      toast.success('Mensagem enviada com sucesso');
     } catch (error) {
       console.error('Error sending message:', error);
       toast.error('Erro ao enviar mensagem');
