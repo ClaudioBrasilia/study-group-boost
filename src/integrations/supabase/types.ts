@@ -344,7 +344,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_admin_groups: {
+        Args: { user_uuid: string }
+        Returns: string[]
+      }
+      get_user_groups: {
+        Args: { user_uuid: string }
+        Returns: string[]
+      }
+      is_user_group_admin: {
+        Args: { group_uuid: string; user_uuid: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
