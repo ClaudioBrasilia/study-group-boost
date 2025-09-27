@@ -1,0 +1,161 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from '@/components/ui/sonner';
+
+export interface WaterStats {
+  todayIntake: number;
+  dailyGoal: number;
+  weeklyData: { name: string; intake: number }[];
+}
+
+export function useWaterData() {
+  const [waterStats, setWaterStats] = useState<WaterStats>({
+    todayIntake: 0,
+    dailyGoal: 2500,
+    weeklyData: []
+  });
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchWaterData();
+    }
+  }, [user]);
+
+  const fetchWaterData = async () => {
+    if (!user) return;
+
+    try {
+      setLoading(true);
+
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Fetch today's water intake
+      const { data: todayData } = await supabase
+        .from('water_intake')
+        .select('amount_ml')
+        .eq('user_id', user.id)
+        .eq('date', today);
+
+      const todayIntake = todayData?.reduce((sum, record) => sum + record.amount_ml, 0) || 0;
+
+      // Fetch weekly data (last 7 days)
+      const weeklyData = [];
+      const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        const dayName = weekDays[date.getDay()];
+
+        const { data: dayData } = await supabase
+          .from('water_intake')
+          .select('amount_ml')
+          .eq('user_id', user.id)
+          .eq('date', dateStr);
+
+        const dayIntake = dayData?.reduce((sum, record) => sum + record.amount_ml, 0) || 0;
+        
+        weeklyData.push({
+          name: dayName,
+          intake: dayIntake
+        });
+      }
+
+      setWaterStats({
+        todayIntake,
+        dailyGoal: 2500, // Fixed goal for now
+        weeklyData
+      });
+
+    } catch (error) {
+      console.error('Error fetching water data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addWaterIntake = async (amount: number) => {
+    if (!user) return;
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      const { error } = await supabase
+        .from('water_intake')
+        .insert({
+          user_id: user.id,
+          amount_ml: amount,
+          date: today
+        });
+
+      if (error) throw error;
+
+      // Update local state
+      setWaterStats(prev => ({
+        ...prev,
+        todayIntake: prev.todayIntake + amount
+      }));
+
+      toast.success(`+${amount}ml de água adicionado!`);
+
+      // Check if goal reached
+      if (waterStats.todayIntake + amount >= waterStats.dailyGoal) {
+        toast.success('🎉 Meta diária de hidratação atingida!', { duration: 5000 });
+      }
+
+    } catch (error) {
+      console.error('Error adding water intake:', error);
+      toast.error('Erro ao registrar consumo de água');
+    }
+  };
+
+  const removeWaterIntake = async (amount: number) => {
+    if (!user) return;
+
+    try {
+      const today = new Date().toISOString().split('T')[0];
+
+      // Get the most recent intake record to remove
+      const { data: records } = await supabase
+        .from('water_intake')
+        .select('id, amount_ml')
+        .eq('user_id', user.id)
+        .eq('date', today)
+        .order('consumed_at', { ascending: false })
+        .limit(1);
+
+      if (records && records.length > 0) {
+        const { error } = await supabase
+          .from('water_intake')
+          .delete()
+          .eq('id', records[0].id);
+
+        if (error) throw error;
+
+        // Update local state
+        setWaterStats(prev => ({
+          ...prev,
+          todayIntake: Math.max(prev.todayIntake - records[0].amount_ml, 0)
+        }));
+
+        toast.success(`-${records[0].amount_ml}ml removido`);
+      }
+
+    } catch (error) {
+      console.error('Error removing water intake:', error);
+      toast.error('Erro ao remover consumo de água');
+    }
+  };
+
+  return {
+    waterStats,
+    loading,
+    addWaterIntake,
+    removeWaterIntake,
+    refreshData: fetchWaterData
+  };
+}

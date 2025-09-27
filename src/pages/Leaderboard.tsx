@@ -1,77 +1,54 @@
 
 import React, { useState } from 'react';
-import { Trophy, Users } from 'lucide-react';
+import { Trophy, Users, RefreshCw } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
-
-// Mock data for leaderboards
-const GLOBAL_USERS = [
-  { id: '1', name: 'Alex Johnson', points: 1250, rank: 1 },
-  { id: '2', name: 'Jamie Smith', points: 980, rank: 2 },
-  { id: '3', name: 'Taylor Wilson', points: 870, rank: 3 },
-  { id: '4', name: 'Jordan Brown', points: 820, rank: 4 },
-  { id: '5', name: 'Casey Miller', points: 750, rank: 5 },
-  { id: '6', name: 'Riley Garcia', points: 720, rank: 6 },
-  { id: '7', name: 'Morgan Lopez', points: 680, rank: 7 },
-  { id: '8', name: 'Drew Martinez', points: 650, rank: 8 },
-  { id: '9', name: 'Avery Rodriguez', points: 620, rank: 9 },
-  { id: '10', name: 'Quinn Hernandez', points: 590, rank: 10 },
-];
-
-const GROUPS = [
-  { 
-    id: '1', 
-    name: 'Math Masters',
-    members: [
-      { id: '1', name: 'Você', points: 230, rank: 3 },
-      { id: '2', name: 'Alex Smith', points: 340, rank: 1 },
-      { id: '3', name: 'Jamie Brown', points: 280, rank: 2 },
-      { id: '4', name: 'Taylor Wilson', points: 190, rank: 4 },
-    ]
-  },
-  { 
-    id: '2', 
-    name: 'Physics Club',
-    members: [
-      { id: '1', name: 'Você', points: 180, rank: 2 },
-      { id: '5', name: 'Robin Lee', points: 250, rank: 1 },
-      { id: '6', name: 'Morgan Hill', points: 150, rank: 3 },
-    ]
-  },
-  {
-    id: '3',
-    name: 'Literature Circle',
-    members: [
-      { id: '1', name: 'Você', points: 310, rank: 1 },
-      { id: '7', name: 'Bailey Adams', points: 290, rank: 2 },
-      { id: '8', name: 'Jordan Evans', points: 260, rank: 3 },
-      { id: '9', name: 'Riley Foster', points: 220, rank: 4 },
-      { id: '10', name: 'Casey Kelly', points: 200, rank: 5 },
-    ]
-  }
-];
+import { useLeaderboardData } from '@/hooks/useLeaderboardData';
 
 const Leaderboard: React.FC = () => {
   const { t } = useTranslation();
   const [timeRange, setTimeRange] = useState('week');
   const [leaderboardType, setLeaderboardType] = useState('global');
-  const [selectedGroup, setSelectedGroup] = useState(GROUPS[0].id);
+  const [selectedGroup, setSelectedGroup] = useState('');
   
-  const currentGroup = GROUPS.find(group => group.id === selectedGroup);
+  const { globalLeaderboard, groupLeaderboards, loading, refreshData } = useLeaderboardData(timeRange);
+  
+  // Set default selected group when data loads
+  React.useEffect(() => {
+    if (groupLeaderboards.length > 0 && !selectedGroup) {
+      setSelectedGroup(groupLeaderboards[0].id);
+    }
+  }, [groupLeaderboards, selectedGroup]);
+  
+  const currentGroup = groupLeaderboards.find(group => group.id === selectedGroup);
   
   // Determine which user list to show based on selected type
   const userList = leaderboardType === 'global' 
-    ? GLOBAL_USERS 
+    ? globalLeaderboard 
     : currentGroup?.members || [];
   
   return (
     <PageLayout>
       <div className="mb-4">
-        <h2 className="text-xl font-bold mb-4">{t('leaderboard.title')}</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">{t('leaderboard.title')}</h2>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refreshData}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            Atualizar
+          </Button>
+        </div>
         
         <div className="flex justify-between items-center mb-4">
           <Tabs value={leaderboardType} onValueChange={setLeaderboardType} className="w-auto">
@@ -96,14 +73,14 @@ const Leaderboard: React.FC = () => {
           </Tabs>
         </div>
         
-        {leaderboardType === 'group' && (
+        {leaderboardType === 'group' && groupLeaderboards.length > 0 && (
           <div className="mb-4">
             <Select value={selectedGroup} onValueChange={setSelectedGroup}>
               <SelectTrigger>
                 <SelectValue placeholder={t('leaderboard.selectGroup')} />
               </SelectTrigger>
               <SelectContent>
-                {GROUPS.map(group => (
+                {groupLeaderboards.map(group => (
                   <SelectItem key={group.id} value={group.id}>{group.name}</SelectItem>
                 ))}
               </SelectContent>
@@ -113,54 +90,87 @@ const Leaderboard: React.FC = () => {
       </div>
       
       <div className="space-y-2">
-        {userList.map((user, index) => {
-          const isCurrentUser = user.name === 'Você';
-          const getRankColor = (rank: number) => {
-            if (rank === 1) return 'bg-yellow-500';
-            if (rank === 2) return 'bg-gray-400';
-            if (rank === 3) return 'bg-amber-700';
-            return 'bg-gray-200 text-gray-700';
-          };
-          
-          return (
-            <Card key={user.id} className={`${isCurrentUser ? 'border-study-primary border-2' : ''}`}>
+        {loading ? (
+          // Loading skeletons
+          Array.from({ length: 5 }).map((_, index) => (
+            <Card key={index}>
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full ${getRankColor(user.rank)} flex items-center justify-center text-white font-bold mr-3`}>
-                    {user.rank}
-                  </div>
+                  <Skeleton className="w-8 h-8 rounded-full mr-3" />
                   <div className="flex items-center">
-                    <Avatar className="h-10 w-10 mr-3">
-                      <AvatarFallback className="bg-study-primary text-white">
-                        {user.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <Skeleton className="h-10 w-10 rounded-full mr-3" />
                     <div>
-                      <div className="font-medium">
-                        {user.name}
-                        {isCurrentUser && <span className="text-xs ml-2 text-study-primary">({t('leaderboard.you')})</span>}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {user.points} {t('leaderboard.points')}
-                      </div>
+                      <Skeleton className="h-4 w-24 mb-2" />
+                      <Skeleton className="h-3 w-16" />
                     </div>
                   </div>
                 </div>
-                
-                {user.rank <= 3 && (
-                  <Trophy 
-                    size={20} 
-                    className={`
-                      ${user.rank === 1 ? 'text-yellow-500' : ''}
-                      ${user.rank === 2 ? 'text-gray-400' : ''}
-                      ${user.rank === 3 ? 'text-amber-700' : ''}
-                    `} 
-                  />
-                )}
+                <Skeleton className="w-5 h-5" />
               </CardContent>
             </Card>
-          );
-        })}
+          ))
+        ) : userList.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center text-muted-foreground">
+              <Trophy size={48} className="mx-auto mb-4 opacity-50" />
+              <p className="text-lg font-medium mb-2">Nenhum dado disponível</p>
+              <p className="text-sm">
+                {leaderboardType === 'global' 
+                  ? 'Não há rankings globais ainda.'
+                  : 'Não há rankings para este grupo ainda.'
+                }
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          userList.map((user) => {
+            const getRankColor = (rank: number) => {
+              if (rank === 1) return 'bg-yellow-500';
+              if (rank === 2) return 'bg-gray-400';
+              if (rank === 3) return 'bg-amber-700';
+              return 'bg-gray-200 text-gray-700';
+            };
+            
+            return (
+              <Card key={user.id} className={`${user.isCurrentUser ? 'border-primary border-2' : ''}`}>
+                <CardContent className="p-4 flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className={`w-8 h-8 rounded-full ${getRankColor(user.rank)} flex items-center justify-center text-white font-bold mr-3`}>
+                      {user.rank}
+                    </div>
+                    <div className="flex items-center">
+                      <Avatar className="h-10 w-10 mr-3">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {user.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">
+                          {user.name}
+                          {user.isCurrentUser && <span className="text-xs ml-2 text-primary">(Você)</span>}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {user.points} pontos
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {user.rank <= 3 && (
+                    <Trophy 
+                      size={20} 
+                      className={`
+                        ${user.rank === 1 ? 'text-yellow-500' : ''}
+                        ${user.rank === 2 ? 'text-gray-400' : ''}
+                        ${user.rank === 3 ? 'text-amber-700' : ''}
+                      `} 
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })
+        )}
       </div>
     </PageLayout>
   );

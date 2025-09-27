@@ -7,44 +7,55 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
+import { useWaterData } from '@/hooks/useWaterData';
 
 const Water: React.FC = () => {
   const { t } = useTranslation();
-  const [waterIntake, setWaterIntake] = useState(1200); // in ml
-  const [cupSize, setCupSize] = useState(250); // in ml
+  const { waterStats, loading, addWaterIntake, removeWaterIntake } = useWaterData();
   const [unitType, setUnitType] = useState('ml');
-  const dailyGoal = 2500; // in ml
 
-  // Mock data for water intake history - using translation keys for day names
-  const weeklyWaterData = [
-    { name: t('days.mon'), intake: 1800 },
-    { name: t('days.tue'), intake: 2200 },
-    { name: t('days.wed'), intake: 1600 },
-    { name: t('days.thu'), intake: 2000 },
-    { name: t('days.fri'), intake: 2500 },
-    { name: t('days.sat'), intake: 1900 },
-    { name: t('days.sun'), intake: 2300 },
-  ];
-
-  
-  const handleAddWater = (amount: number) => {
-    setWaterIntake(prev => Math.min(prev + amount, 5000)); // Cap at 5000ml
-  };
-  
-  const handleRemoveWater = (amount: number) => {
-    setWaterIntake(prev => Math.max(prev - amount, 0));
-  };
-  
-  const displayIntake = unitType === 'ml' ? waterIntake : (waterIntake / 1000).toFixed(1);
-  const displayGoal = unitType === 'ml' ? dailyGoal : (dailyGoal / 1000).toFixed(1);
-  const progressPercentage = (waterIntake / dailyGoal) * 100;
+  const displayIntake = unitType === 'ml' ? waterStats.todayIntake : (waterStats.todayIntake / 1000).toFixed(1);
+  const displayGoal = unitType === 'ml' ? waterStats.dailyGoal : (waterStats.dailyGoal / 1000).toFixed(1);
+  const progressPercentage = (waterStats.todayIntake / waterStats.dailyGoal) * 100;
   
   // Convert weekly data based on unit type
-  const formattedWeeklyData = weeklyWaterData.map(day => ({
+  const formattedWeeklyData = waterStats.weeklyData.map(day => ({
     name: day.name,
     intake: unitType === 'ml' ? day.intake : day.intake / 1000
   }));
+
+  if (loading) {
+    return (
+      <PageLayout>
+        <div className="mb-6">
+          <h2 className="text-xl font-bold mb-4">{t('water.title')}</h2>
+          <Card className="overflow-hidden mb-6">
+            <div className="relative bg-gradient-to-br from-blue-400 to-blue-600 p-6 text-white">
+              <div className="relative z-10 flex flex-col items-center">
+                <Skeleton className="h-16 w-32 mb-4 bg-white/20" />
+                <Skeleton className="h-3 w-52 bg-white/20" />
+              </div>
+            </div>
+            <CardContent className="p-4">
+              <div className="flex justify-center mb-4">
+                <Skeleton className="h-8 w-40" />
+              </div>
+              <div className="flex justify-center gap-3 mb-2">
+                <Skeleton className="h-14 w-14 rounded-full" />
+                <Skeleton className="h-14 w-14 rounded-full" />
+                <Skeleton className="h-14 w-14 rounded-full" />
+              </div>
+              <div className="flex justify-center">
+                <Skeleton className="h-10 w-32" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </PageLayout>
+    );
+  }
   
   return (
     <PageLayout>
@@ -81,7 +92,7 @@ const Water: React.FC = () => {
                 variant="outline" 
                 size="sm" 
                 className="h-14 w-14 rounded-full flex flex-col items-center justify-center"
-                onClick={() => handleAddWater(cupSize)}
+                onClick={() => addWaterIntake(250)}
               >
                 <Droplet size={18} className="text-blue-500 mb-1" />
                 <span className="text-xs">+1 Copo</span>
@@ -91,7 +102,7 @@ const Water: React.FC = () => {
                 variant="outline" 
                 size="sm" 
                 className="h-14 w-14 rounded-full flex flex-col items-center justify-center"
-                onClick={() => handleAddWater(500)}
+                onClick={() => addWaterIntake(500)}
               >
                 <Droplet size={18} className="text-blue-500 mb-1" />
                 <span className="text-xs">+500ml</span>
@@ -101,7 +112,7 @@ const Water: React.FC = () => {
                 variant="outline" 
                 size="sm" 
                 className="h-14 w-14 rounded-full flex flex-col items-center justify-center"
-                onClick={() => handleRemoveWater(250)}
+                onClick={() => removeWaterIntake(250)}
               >
                 <Minus size={18} className="text-red-500 mb-1" />
                 <span className="text-xs">-250ml</span>
@@ -111,7 +122,7 @@ const Water: React.FC = () => {
             <div className="flex justify-center">
               <Button 
                 className="bg-blue-500 hover:bg-blue-600"
-                onClick={() => handleAddWater(250)}
+                onClick={() => addWaterIntake(250)}
               >
                 <Plus size={18} className="mr-1" /> {t('water.addWater')}
               </Button>
