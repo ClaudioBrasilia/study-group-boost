@@ -1,26 +1,41 @@
-
 import React from 'react';
-import { Clock, BookOpen } from 'lucide-react';
+import { Clock, BookOpen, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { GoalType } from '@/types/groupTypes';
+import { useNavigate } from 'react-router-dom';
 
 interface GroupOverviewTabProps {
   goals: GoalType[];
   isVestibularGroup: boolean;
   getSubjectNameById: (id: string) => string;
   onViewAllGoals: () => void;
+  groupId: string;
 }
 
-const GroupOverviewTab: React.FC<GroupOverviewTabProps> = ({
-  goals,
-  isVestibularGroup,
-  getSubjectNameById,
-  onViewAllGoals
+const GroupOverviewTab: React.FC<GroupOverviewTabProps> = ({ 
+  goals, 
+  isVestibularGroup, 
+  getSubjectNameById, 
+  onViewAllGoals,
+  groupId 
 }) => {
+  const navigate = useNavigate();
+  
   return (
     <div className="space-y-6">
       <div className="card">
-        <h3 className="font-semibold mb-2">Atividade Recente</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold">Atividade Recente</h3>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate(`/group/${groupId}/progress`)}
+            className="flex items-center gap-1"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Ver Progresso
+          </Button>
+        </div>
         <div className="space-y-3">
           {[1, 2, 3].map((item) => (
             <div key={item} className="flex items-start space-x-3">

@@ -98,6 +98,7 @@ const GroupDetail: React.FC = () => {
             isVestibularGroup={isVestibularGroup}
             getSubjectNameById={getSubjectNameById}
             onViewAllGoals={() => setActiveTab('goals')}
+            groupId={groupId || ''}
           />
         </TabsContent>
         
