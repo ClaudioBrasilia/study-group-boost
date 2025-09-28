@@ -1,13 +1,9 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.ef41847bab774d5da37f0e39334293cb',
-  appName: 'study-group-boost',
+  appId: 'com.studyboost.app',
+  appName: 'StudyBoost',
   webDir: 'dist',
-  server: {
-    url: 'https://ef41847b-ab77-4d5d-a37f-0e39334293cb.lovableproject.com?forceHideBadge=true',
-    cleartext: true
-  },
   plugins: {
     SplashScreen: {
       launchShowDuration: 3000,

@@ -1,8 +1,8 @@
 
 {
-  "name": "StudyBoost",
+  "name": "StudyBoost - Estude em grupo",
   "short_name": "StudyBoost",
-  "description": "Estude em grupo, alcance seus objetivos",
+  "description": "Estude em grupo, alcance seus objetivos acadêmicos",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
