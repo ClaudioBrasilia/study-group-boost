@@ -214,13 +214,29 @@
     "logout": "Sair",
     "settings": {
       "profile": "Perfil",
-      "security": "Segurança",
+      "security": "Segurança", 
       "subscription": "Assinatura",
       "name": "Nome",
       "email": "Email",
       "currentPassword": "Senha Atual",
       "newPassword": "Nova Senha",
       "confirmPassword": "Confirmar Senha"
+    },
+    "achievementNames": {
+      "studyWarrior": "Guerreiro do Estudo",
+      "knowledgeSeeker": "Buscador de Conhecimento",
+      "groupLeader": "Líder de Grupo",
+      "problemSolver": "Solucionador de Problemas",
+      "hydrationMaster": "Mestre da Hidratação",
+      "dedicationStar": "Estrela da Dedicação"
+    },
+    "achievementDescriptions": {
+      "studyWarrior": "Conquiste 100 pontos de estudo",
+      "knowledgeSeeker": "Conquiste 500 pontos de estudo",
+      "groupLeader": "Participe de pelo menos 1 grupo de estudo",
+      "problemSolver": "Conquiste 1000 pontos de estudo",
+      "hydrationMaster": "Mantenha uma boa hidratação por 7 dias",
+      "dedicationStar": "Alcance o nível 10"
     }
   },
   "water": {

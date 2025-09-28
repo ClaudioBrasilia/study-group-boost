@@ -315,6 +315,39 @@ export type Database = {
           },
         ]
       }
+      user_preferences: {
+        Row: {
+          achievements: boolean
+          created_at: string
+          goal_reminders: boolean
+          group_activity: boolean
+          id: string
+          updated_at: string
+          user_id: string
+          weekly_report: boolean
+        }
+        Insert: {
+          achievements?: boolean
+          created_at?: string
+          goal_reminders?: boolean
+          group_activity?: boolean
+          id?: string
+          updated_at?: string
+          user_id: string
+          weekly_report?: boolean
+        }
+        Update: {
+          achievements?: boolean
+          created_at?: string
+          goal_reminders?: boolean
+          group_activity?: boolean
+          id?: string
+          updated_at?: string
+          user_id?: string
+          weekly_report?: boolean
+        }
+        Relationships: []
+      }
       water_intake: {
         Row: {
           amount_ml: number

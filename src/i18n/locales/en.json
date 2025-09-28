@@ -145,7 +145,33 @@
     "achievementAlerts": "Notifications when you earn achievements",
     "weeklyReport": "Weekly Report",
     "progressSummary": "Weekly summary of your progress",
-    "logout": "Logout"
+    "logout": "Logout",
+    "settings": {
+      "profile": "Profile",
+      "security": "Security",
+      "subscription": "Subscription", 
+      "name": "Name",
+      "email": "Email",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "achievementNames": {
+      "studyWarrior": "Study Warrior",
+      "knowledgeSeeker": "Knowledge Seeker", 
+      "groupLeader": "Group Leader",
+      "problemSolver": "Problem Solver",
+      "hydrationMaster": "Hydration Master",
+      "dedicationStar": "Dedication Star"
+    },
+    "achievementDescriptions": {
+      "studyWarrior": "Earn 100 study points",
+      "knowledgeSeeker": "Earn 500 study points",
+      "groupLeader": "Join at least 1 study group",
+      "problemSolver": "Earn 1000 study points", 
+      "hydrationMaster": "Stay hydrated for 7 days",
+      "dedicationStar": "Reach level 10"
+    }
   },
   "language": {
     "title": "Language",
