@@ -20,6 +20,7 @@ import Plans from "./pages/subscription/Plans";
 import TestGenerator from "./pages/premium/TestGenerator";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import ProfileSettings from "./components/profile/ProfileSettings";
 import SplashScreen from "./components/SplashScreen";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import "./i18n";
@@ -56,6 +57,7 @@ const App = () => {
             <Route path="/water" element={<ProtectedRoute><Water /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/profile/settings" element={<ProtectedRoute><ProfileSettings /></ProtectedRoute>} />
             <Route path="/plans" element={<ProtectedRoute><Plans /></ProtectedRoute>} />
             <Route path="/generate-test" element={<ProtectedRoute><TestGenerator /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />

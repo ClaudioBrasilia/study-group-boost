@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Trophy, Book, Calendar, Award, Bell } from 'lucide-react';
+import { Trophy, Book, Calendar, Award, Bell, Settings } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -14,6 +15,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 
 const Profile: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { profileStats, loading } = useProfileData();
   const [notifications, setNotifications] = useState({
     goalReminders: true,
@@ -57,11 +59,22 @@ const Profile: React.FC = () => {
   return (
     <PageLayout>
       <div className="text-center mb-8">
-        <Avatar className="h-24 w-24 mx-auto mb-4">
-          <AvatarFallback className="bg-primary text-primary-foreground text-xl">
-            {profileStats.name.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <div className="flex items-center justify-between mb-4">
+          <div></div>
+          <Avatar className="h-24 w-24">
+            <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+              {profileStats.name.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/profile/settings')}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <Settings size={20} />
+          </Button>
+        </div>
         <h2 className="text-2xl font-bold">{profileStats.name}</h2>
         <div className="text-muted-foreground mb-2">{t('profile.level')} {profileStats.level} {t('profile.scholar')}</div>
         
@@ -89,11 +102,21 @@ const Profile: React.FC = () => {
         </div>
         
         <div className="flex justify-center space-x-2">
-          <Button variant="outline" size="sm" className="flex items-center">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center"
+            onClick={() => window.location.href = '/progress'}
+          >
             <Calendar size={14} className="mr-1" />
             <span>{t('profile.studyStats')}</span>
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center"
+            onClick={() => window.location.href = '/groups'}
+          >
             <Book size={14} className="mr-1" />
             <span>{t('profile.myGroups')} ({profileStats.groups})</span>
           </Button>

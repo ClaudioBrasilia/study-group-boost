@@ -5,6 +5,7 @@ import { toast } from '@/components/ui/sonner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
   DialogContent,
@@ -16,6 +17,7 @@ import {
 import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
+import PageLayout from '@/components/layout/PageLayout';
 
 const ProfileSettings: React.FC = () => {
   const { user, updateUserPlan } = useAuth();
@@ -28,41 +30,75 @@ const ProfileSettings: React.FC = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
   
-  const handleUpdateProfile = (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsUpdating(true);
     
-    // Simulação de atualização de perfil
-    setTimeout(() => {
+    try {
+      if (!user) throw new Error('No user found');
+
+      // Update profile in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({ name })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
       toast.success(t('profile.settings.profileUpdated'));
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Erro ao atualizar perfil');
+    } finally {
       setIsUpdating(false);
-    }, 1000);
+    }
   };
   
-  const handlePasswordChange = (e: React.FormEvent) => {
+  const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (newPassword !== confirmPassword) {
       toast.error(t('profile.settings.passwordsNotMatch'));
       return;
     }
+
+    if (newPassword.length < 6) {
+      toast.error('A senha deve ter pelo menos 6 caracteres');
+      return;
+    }
     
     setIsUpdating(true);
     
-    // Simulação de alteração de senha
-    setTimeout(() => {
+    try {
+      // Update password in Supabase Auth
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (error) throw error;
+
       toast.success(t('profile.settings.passwordChanged'));
       setPasswordDialogOpen(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+    } catch (error) {
+      console.error('Error changing password:', error);
+      toast.error('Erro ao alterar senha');
+    } finally {
       setIsUpdating(false);
-    }, 1000);
+    }
   };
   
   return (
-    <div className="space-y-6">
-      <Tabs defaultValue="profile" className="w-full">
+    <PageLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">{t('profile.settings.title', 'Configurações')}</h1>
+          <p className="text-muted-foreground">{t('profile.settings.description', 'Gerencie sua conta e preferências')}</p>
+        </div>
+        
+        <Tabs defaultValue="profile" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="profile">{t('profile.settings.profile')}</TabsTrigger>
           <TabsTrigger value="security">{t('profile.settings.security')}</TabsTrigger>
@@ -154,7 +190,8 @@ const ProfileSettings: React.FC = () => {
             </Link>
           </div>
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </div>
       
       <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
         <DialogContent>
@@ -211,7 +248,7 @@ const ProfileSettings: React.FC = () => {
           </form>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 };
 
