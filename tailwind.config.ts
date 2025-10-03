@@ -73,10 +73,10 @@ export default {
 					success: 'hsl(145, 70%, 48%)',
 					warning: 'hsl(45, 95%, 55%)',
 					error: 'hsl(355, 88%, 58%)',
-					background: 'hsl(35, 65%, 96%)',
+					background: 'hsl(210, 20%, 96%)',
 					card: 'hsl(0, 0%, 100%)',
-					text: 'hsl(220, 40%, 18%)',
-					lightText: 'hsl(220, 20%, 45%)',
+					text: 'hsl(215, 25%, 20%)',
+					lightText: 'hsl(215, 18%, 45%)',
 				}
 			},
 			borderRadius: {
