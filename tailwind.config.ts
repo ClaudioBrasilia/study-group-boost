@@ -67,16 +67,16 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				study: {
-					primary: 'hsl(210, 85%, 60%)',
-					secondary: 'hsl(165, 60%, 55%)',
-					accent: 'hsl(260, 70%, 65%)',
-					success: 'hsl(142, 65%, 50%)',
+					primary: 'hsl(215, 90%, 58%)',
+					secondary: 'hsl(168, 65%, 52%)',
+					accent: 'hsl(265, 75%, 62%)',
+					success: 'hsl(145, 70%, 48%)',
 					warning: 'hsl(45, 95%, 55%)',
-					error: 'hsl(0, 84%, 60%)',
-					background: 'hsl(40, 15%, 97%)',
+					error: 'hsl(355, 88%, 58%)',
+					background: 'hsl(35, 65%, 96%)',
 					card: 'hsl(0, 0%, 100%)',
-					text: 'hsl(222, 45%, 15%)',
-					lightText: 'hsl(215, 16%, 47%)',
+					text: 'hsl(220, 40%, 18%)',
+					lightText: 'hsl(220, 20%, 45%)',
 				}
 			},
 			borderRadius: {

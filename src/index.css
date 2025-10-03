@@ -7,75 +7,75 @@
 
 @layer base {
   :root {
-    --background: 40 15% 97%;
-    --foreground: 222 45% 15%;
+    --background: 35 65% 96%;
+    --foreground: 220 40% 18%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 45% 15%;
+    --card-foreground: 220 40% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 45% 15%;
+    --popover-foreground: 220 40% 18%;
 
-    --primary: 210 85% 60%;
+    --primary: 215 90% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 165 60% 55%;
+    --secondary: 168 65% 52%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 20% 92%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 35 35% 90%;
+    --muted-foreground: 220 20% 45%;
 
-    --accent: 260 70% 65%;
+    --accent: 265 75% 62%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 355 88% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 88%;
-    --input: 220 15% 90%;
-    --ring: 210 85% 60%;
+    --border: 35 30% 85%;
+    --input: 35 30% 88%;
+    --ring: 215 90% 58%;
 
     --radius: 0.75rem;
     
     /* Gradientes para progresso e elementos especiais */
-    --gradient-primary: linear-gradient(135deg, hsl(210, 85%, 60%), hsl(195, 80%, 55%));
-    --gradient-secondary: linear-gradient(135deg, hsl(165, 60%, 55%), hsl(145, 65%, 50%));
-    --gradient-accent: linear-gradient(135deg, hsl(260, 70%, 65%), hsl(280, 75%, 60%));
+    --gradient-primary: linear-gradient(135deg, hsl(215, 90%, 58%), hsl(195, 85%, 55%));
+    --gradient-secondary: linear-gradient(135deg, hsl(168, 65%, 52%), hsl(145, 70%, 48%));
+    --gradient-accent: linear-gradient(135deg, hsl(265, 75%, 62%), hsl(280, 80%, 58%));
   }
 
   .dark {
-    --background: 222 45% 10%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 17%;
+    --foreground: 0 0% 95%;
 
-    --card: 222 40% 13%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 20%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 222 40% 13%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 20%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 210 85% 60%;
+    --primary: 215 85% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 165 55% 45%;
+    --secondary: 168 60% 50%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 217 32% 20%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 0 0% 25%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 260 70% 60%;
+    --accent: 265 70% 60%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 70% 50%;
+    --destructive: 355 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217 32% 22%;
-    --input: 217 32% 22%;
-    --ring: 210 85% 60%;
+    --border: 0 0% 28%;
+    --input: 0 0% 28%;
+    --ring: 215 85% 60%;
     
     /* Gradientes para dark mode */
-    --gradient-primary: linear-gradient(135deg, hsl(210, 85%, 55%), hsl(195, 80%, 50%));
-    --gradient-secondary: linear-gradient(135deg, hsl(165, 55%, 45%), hsl(145, 60%, 45%));
-    --gradient-accent: linear-gradient(135deg, hsl(260, 70%, 60%), hsl(280, 75%, 55%));
+    --gradient-primary: linear-gradient(135deg, hsl(215, 85%, 60%), hsl(195, 80%, 55%));
+    --gradient-secondary: linear-gradient(135deg, hsl(168, 60%, 50%), hsl(145, 65%, 48%));
+    --gradient-accent: linear-gradient(135deg, hsl(265, 70%, 60%), hsl(280, 75%, 58%));
   }
 }
 
@@ -85,7 +85,7 @@
   }
 
   body {
-    @apply bg-study-background text-study-text font-sans;
+    @apply bg-background text-foreground font-sans;
   }
 
   /* Custom styles for the app */
