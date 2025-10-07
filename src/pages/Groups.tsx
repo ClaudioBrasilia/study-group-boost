@@ -143,24 +143,39 @@ const Groups: React.FC = () => {
   };
 
   const handleGroupClick = async (group: any) => {
-    // Check if user has premium access for premium groups
+    // Premium gating for premium groups
     if (group.isPremium && user?.plan !== 'premium') {
       toast.error('Este é um grupo exclusivo para usuários Premium');
       navigate('/plans');
       return;
     }
-    
-    // If user is not a member, join the group first
-    if (!group.isMember) {
-      const result = await joinGroup(group.id);
-      if (result.success) {
-        toast.success('Você entrou no grupo!');
-      } else {
-        toast.error(result.error);
+
+    // Special case: Vestibular Brasil group (premium-only join allowed)
+    if (group.id === VESTIBULAR_GROUP_ID) {
+      if (user?.plan !== 'premium') {
+        toast.error('Este é um grupo exclusivo para usuários Premium');
+        navigate('/plans');
         return;
       }
+      if (!group.isMember) {
+        const result = await joinGroup(group.id);
+        if (result.success) {
+          toast.success('Você entrou no grupo!');
+        } else {
+          toast.error(result.error);
+          return;
+        }
+      }
+      navigate(`/group/${group.id}`);
+      return;
     }
-    
+
+    // Other groups: only allow access if already a member
+    if (!group.isMember) {
+      toast.error('Você não faz parte deste grupo');
+      return;
+    }
+
     navigate(`/group/${group.id}`);
   };
 
