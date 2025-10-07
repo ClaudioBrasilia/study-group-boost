@@ -16,6 +16,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
+// Fixed group ID for Vestibular Brasil
+const VESTIBULAR_GROUP_ID = 'b47ac10b-58cc-4372-a567-0e02b2c3d479';
+
 // Schema validation for group creation
 const createGroupSchema = z.object({
   name: z.string()
@@ -148,7 +151,7 @@ const Groups: React.FC = () => {
     }
     
     // If user is not a member, join the group first
-    if (!group.isMember && group.id !== 'vestibular-brasil') {
+    if (!group.isMember) {
       const result = await joinGroup(group.id);
       if (result.success) {
         toast.success('Você entrou no grupo!');
@@ -156,9 +159,6 @@ const Groups: React.FC = () => {
         toast.error(result.error);
         return;
       }
-    } else if (group.id === 'vestibular-brasil' && !group.isMember) {
-      // Special case for vestibular group - just navigate without joining
-      // (it's a special fixed group)
     }
     
     navigate(`/group/${group.id}`);

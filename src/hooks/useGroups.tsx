@@ -169,6 +169,20 @@ export const useGroups = () => {
         return { success: false, error: 'Você já é membro deste grupo' };
       }
 
+      // Check if group is premium
+      const { data: groupData } = await supabase
+        .from('groups')
+        .select('id')
+        .eq('id', groupId)
+        .single();
+
+      // Check if it's the Vestibular Brasil group (premium)
+      const isPremiumGroup = groupId === 'b47ac10b-58cc-4372-a567-0e02b2c3d479';
+      
+      if (isPremiumGroup && user.plan !== 'premium') {
+        return { success: false, error: 'Este é um grupo exclusivo para usuários Premium' };
+      }
+
       // Add user as member
       const { error } = await supabase
         .from('group_members')
