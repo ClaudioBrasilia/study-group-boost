@@ -5,11 +5,13 @@ import { Users, BarChart2, Droplet, Award, User, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTimer } from '@/context/TimerContext';
 import { Badge } from '@/components/ui/badge';
+import { useGroupInvitations } from '@/hooks/useGroupInvitations';
 
 const BottomNav: React.FC = () => {
   const location = useLocation();
   const { t } = useTranslation();
   const { isRunning, seconds } = useTimer();
+  const { pendingCount } = useGroupInvitations();
   
   const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60);
@@ -34,6 +36,9 @@ const BottomNav: React.FC = () => {
         
         const isTimerIcon = item.to === '/timer';
         
+        const isGroupsIcon = item.to === '/groups';
+        const showInvitationBadge = isGroupsIcon && pendingCount > 0;
+
         return (
           <Link 
             key={item.to}
@@ -50,6 +55,14 @@ const BottomNav: React.FC = () => {
                   className="absolute -top-2 -right-2 h-4 px-1 text-[9px] animate-pulse"
                 >
                   {formatTime(seconds)}
+                </Badge>
+              )}
+              {showInvitationBadge && (
+                <Badge 
+                  variant="default" 
+                  className="absolute -top-2 -right-2 h-4 px-1 text-[9px]"
+                >
+                  {pendingCount}
                 </Badge>
               )}
             </div>

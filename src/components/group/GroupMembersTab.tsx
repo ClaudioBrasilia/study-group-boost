@@ -1,29 +1,31 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Member } from '@/types/groupTypes';
 import { useTranslation } from 'react-i18next';
-import { toast } from '@/components/ui/sonner';
+import { InvitationDialog } from '@/components/invitations/InvitationDialog';
 
 interface GroupMembersTabProps {
   members: Member[];
+  groupId: string;
+  isAdmin?: boolean;
 }
 
-const GroupMembersTab: React.FC<GroupMembersTabProps> = ({ members }) => {
+const GroupMembersTab: React.FC<GroupMembersTabProps> = ({ members, groupId, isAdmin = false }) => {
   const { t } = useTranslation();
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="font-semibold">{t('group.members')} ({members.length})</h3>
-        <Button size="sm" className="bg-study-primary" onClick={() => {
-          // TODO: Implement invite functionality
-          toast.info('Funcionalidade de convite em desenvolvimento');
-        }}>
-          {t('group.inviteMember')}
-        </Button>
+        {isAdmin && (
+          <Button size="sm" onClick={() => setInviteDialogOpen(true)}>
+            {t('group.inviteMember')}
+          </Button>
+        )}
       </div>
       
       <div className="space-y-3">
@@ -42,6 +44,12 @@ const GroupMembersTab: React.FC<GroupMembersTabProps> = ({ members }) => {
           </div>
         ))}
       </div>
+
+      <InvitationDialog
+        open={inviteDialogOpen}
+        onOpenChange={setInviteDialogOpen}
+        groupId={groupId}
+      />
     </div>
   );
 };

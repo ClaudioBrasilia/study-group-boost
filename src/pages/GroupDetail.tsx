@@ -123,6 +123,8 @@ const GroupDetail: React.FC = () => {
         <TabsContent value="members">
           <GroupMembersTab
             members={members}
+            groupId={groupId || ''}
+            isAdmin={currentUserIsAdmin}
           />
         </TabsContent>
         

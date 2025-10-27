@@ -101,6 +101,47 @@ export type Database = {
         }
         Relationships: []
       }
+      group_invitations: {
+        Row: {
+          created_at: string
+          expires_at: string
+          group_id: string
+          id: string
+          invitee_email: string
+          invitee_id: string | null
+          inviter_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          group_id: string
+          id?: string
+          invitee_email: string
+          invitee_id?: string | null
+          inviter_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          group_id?: string
+          id?: string
+          invitee_email?: string
+          invitee_id?: string | null
+          inviter_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_invitations_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       group_members: {
         Row: {
           group_id: string
@@ -377,14 +418,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_admin_groups: {
-        Args: { user_uuid: string }
-        Returns: string[]
-      }
-      get_user_groups: {
-        Args: { user_uuid: string }
-        Returns: string[]
-      }
+      get_user_admin_groups: { Args: { user_uuid: string }; Returns: string[] }
+      get_user_email: { Args: { user_uuid: string }; Returns: string }
+      get_user_groups: { Args: { user_uuid: string }; Returns: string[] }
       is_user_group_admin: {
         Args: { group_uuid: string; user_uuid: string }
         Returns: boolean
