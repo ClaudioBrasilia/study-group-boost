@@ -27,7 +27,7 @@ const BottomNav: React.FC = () => {
   ];
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-2 px-4">
+    <nav className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-border/50 flex justify-around py-2 px-4 shadow-elegant">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = location.pathname === item.to;
@@ -38,8 +38,8 @@ const BottomNav: React.FC = () => {
           <Link 
             key={item.to}
             to={item.to} 
-            className={`nav-link flex flex-col items-center px-2 py-1 text-xs relative ${
-              isActive ? 'text-study-primary font-medium' : 'text-gray-500'
+            className={`nav-link flex flex-col items-center px-2 py-1 text-xs relative transition-smooth ${
+              isActive ? 'text-primary font-semibold scale-105' : 'text-muted-foreground hover:text-primary'
             }`}
           >
             <div className="relative">

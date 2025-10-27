@@ -55,15 +55,15 @@ const AppHeader: React.FC = () => {
   };
   
   return (
-    <header className="bg-white border-b border-gray-100 py-4 px-6 sticky top-0 z-10 flex items-center justify-between">
+    <header className="bg-gradient-to-r from-background via-background to-primary/5 border-b border-border/50 backdrop-blur-sm py-4 px-6 sticky top-0 z-10 flex items-center justify-between shadow-elegant">
       <div className="flex-1"></div>
       
-      <h1 className="text-xl font-semibold text-center text-study-primary flex-1">{title}</h1>
+      <h1 className="text-xl font-bold text-center bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent flex-1">{title}</h1>
       
       <div className="flex items-center gap-2 flex-1 justify-end">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="text-gray-600">
+            <Button variant="ghost" size="icon" className="text-foreground hover:bg-primary/10 transition-smooth">
               <LanguagesIcon size={20} />
             </Button>
           </DropdownMenuTrigger>
@@ -80,7 +80,7 @@ const AppHeader: React.FC = () => {
         {user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-gray-600">
+              <Button variant="ghost" size="icon" className="text-foreground hover:bg-primary/10 transition-smooth">
                 <UserIcon size={20} />
               </Button>
             </DropdownMenuTrigger>
