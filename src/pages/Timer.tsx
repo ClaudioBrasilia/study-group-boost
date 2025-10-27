@@ -1,12 +1,13 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Pause, StopCircle, RotateCcw, Clock, Trophy } from 'lucide-react';
+import { Play, Pause, StopCircle, RotateCcw, Clock } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/context/AuthContext';
+import { useTimer } from '@/context/TimerContext';
 import { useStudySessions } from '@/hooks/useStudySessions';
 import { toast } from '@/components/ui/sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -15,70 +16,20 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 // Points per minute of study
 const POINTS_PER_MINUTE = 1;
 
-// Key for storing timer state in localStorage
-const TIMER_STATE_KEY = 'studyBoostTimerState';
-
 const Timer: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { 
+    seconds, 
+    isRunning, 
+    selectedSubject, 
+    selectedGroup,
+    setIsRunning,
+    setSelectedSubject,
+    setSelectedGroup,
+    resetTimer
+  } = useTimer();
   const { studySessions, subjects, groups, loading, createStudySession, getSubjectsByGroup } = useStudySessions();
-  
-  // Timer state
-  const [seconds, setSeconds] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState('');
-  
-  // Refs for interval management
-  const intervalRef = useRef<number | null>(null);
-
-  // Load timer state from localStorage on component mount
-  useEffect(() => {
-    const savedTimerState = localStorage.getItem(TIMER_STATE_KEY);
-    if (savedTimerState) {
-      const { seconds: savedSeconds, isRunning: wasRunning, selectedSubject: savedSubject, selectedGroup: savedGroup } = JSON.parse(savedTimerState);
-      setSeconds(savedSeconds);
-      setSelectedSubject(savedSubject);
-      setSelectedGroup(savedGroup);
-      
-      // Resume timer if it was running
-      if (wasRunning) {
-        setIsRunning(true);
-      }
-    }
-  }, []);
-  
-  // Save timer state to localStorage whenever it changes
-  useEffect(() => {
-    if (isRunning || seconds > 0) {
-      localStorage.setItem(TIMER_STATE_KEY, JSON.stringify({
-        seconds,
-        isRunning,
-        selectedSubject,
-        selectedGroup
-      }));
-    } else if (seconds === 0) {
-      localStorage.removeItem(TIMER_STATE_KEY);
-    }
-  }, [seconds, isRunning, selectedSubject, selectedGroup]);
-  
-  // Handle timer logic
-  useEffect(() => {
-    if (isRunning) {
-      intervalRef.current = window.setInterval(() => {
-        setSeconds(prevSeconds => prevSeconds + 1);
-      }, 1000);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isRunning]);
   
   // Format time display (HH:MM:SS)
   const formatTime = (totalSeconds: number) => {
@@ -111,10 +62,8 @@ const Timer: React.FC = () => {
   };
   
   const handleReset = () => {
-    // Apenas permitir reiniciar se o cronômetro não estiver em execução
     if (!isRunning) {
-      setSeconds(0);
-      localStorage.removeItem(TIMER_STATE_KEY);
+      resetTimer();
       toast.info('Cronômetro reiniciado');
     } else {
       toast.error('Pause o cronômetro antes de reiniciar');
@@ -132,13 +81,8 @@ const Timer: React.FC = () => {
     const result = await createStudySession(selectedSubject, seconds);
     
     if (result.success) {
-      // Remove timer state from localStorage after finishing session
-      localStorage.removeItem(TIMER_STATE_KEY);
-      
       toast.success(`Sessão de estudo concluída! Você ganhou ${result.points} pontos!`);
-      
-      // Reset timer
-      setSeconds(0);
+      resetTimer();
     } else {
       toast.error(result.error || 'Erro ao salvar sessão de estudo');
     }

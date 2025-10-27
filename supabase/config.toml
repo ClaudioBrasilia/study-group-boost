@@ -1,1 +1,4 @@
 project_id = "nwtodahupgqbatxeluat"
+
+[functions.generate-test-questions]
+verify_jwt = true
