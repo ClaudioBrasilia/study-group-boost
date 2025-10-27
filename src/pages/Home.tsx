@@ -18,26 +18,28 @@ const Home: React.FC = () => {
   }, [user, isLoading, navigate]);
   
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-purple-50 p-6">
-      <h1 className="text-4xl font-bold text-study-primary mb-6 text-center">
-        {t('app.name')}
-      </h1>
-      <p className="text-lg text-study-secondary mb-12 text-center">
-        {t('app.slogan')}
-      </p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-accent/10 p-6">
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent mb-6 text-center">
+          {t('app.name')}
+        </h1>
+        <p className="text-xl text-muted-foreground mb-12 text-center max-w-md">
+          {t('app.slogan')}
+        </p>
+      </div>
       
-      <div className="w-64 h-64 rounded-full bg-study-primary bg-opacity-20 flex items-center justify-center mb-12">
-        <div className="w-48 h-48 rounded-full bg-study-primary bg-opacity-30 flex items-center justify-center">
-          <div className="w-32 h-32 rounded-full bg-study-primary flex items-center justify-center">
-            <span className="text-white text-3xl font-bold">SB</span>
-          </div>
+      <div className="relative w-64 h-64 rounded-full mb-12 animate-in zoom-in duration-1000 delay-300">
+        <div className="absolute inset-0 rounded-full bg-primary/20 animate-pulse-slow" />
+        <div className="absolute inset-8 rounded-full bg-primary/30 animate-pulse-slow delay-150" />
+        <div className="absolute inset-16 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30">
+          <span className="text-white text-4xl font-bold">SB</span>
         </div>
       </div>
       
-      <div className="space-y-4 w-full max-w-xs">
+      <div className="space-y-4 w-full max-w-xs animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
         {isLoading ? (
           <Button 
-            className="w-full bg-study-primary opacity-50" 
+            className="w-full" 
             disabled
           >
             {t('loading')}
@@ -45,14 +47,14 @@ const Home: React.FC = () => {
         ) : user ? (
           <>
             <Button 
-              className="w-full bg-study-primary hover:bg-opacity-90" 
+              className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all" 
               onClick={() => navigate('/groups')}
             >
               {t('navigation.groups')}
             </Button>
             {user.plan === 'premium' && (
               <Button 
-                className="w-full bg-study-secondary hover:bg-opacity-90" 
+                className="w-full bg-gradient-to-r from-secondary to-secondary/90 hover:from-secondary/90 hover:to-secondary shadow-md hover:shadow-lg transition-all" 
                 onClick={() => navigate('/generate-test')}
               >
                 {t('aiTests.title')}
@@ -62,13 +64,14 @@ const Home: React.FC = () => {
         ) : (
           <>
             <Button 
-              className="w-full bg-study-primary hover:bg-opacity-90" 
+              className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all" 
               onClick={() => navigate('/login')}
             >
               {t('login.title')}
             </Button>
             <Button 
-              className="w-full bg-white border border-study-primary text-study-primary hover:bg-gray-50" 
+              variant="outline"
+              className="w-full border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all" 
               onClick={() => navigate('/register')}
             >
               {t('register.title')}
