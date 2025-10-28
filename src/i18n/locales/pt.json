@@ -121,7 +121,24 @@
     "apiKeyPlaceholder": "Digite sua chave da API OpenAI",
     "saveApiKey": "Salvar e Continuar",
     "apiKeySaved": "Chave da API salva com sucesso",
-    "resetTimer": "Cronômetro reiniciado"
+    "resetTimer": "Cronômetro reiniciado",
+    "progress": "Progresso",
+    "questionsAnswered": "questões respondidas",
+    "yourScore": "Sua Nota",
+    "correct": "Certas",
+    "wrong": "Erradas",
+    "reviewWrong": "Revisar Questões Erradas",
+    "unansweredWarning": "Você deixou {{count}} questão(ões) sem resposta! Deseja submeter mesmo assim?",
+    "correctionSuccess": "Teste corrigido! Você acertou {{correct}} de {{total}} questões.",
+    "correctAnswer": "Resposta correta",
+    "yourAnswer": "Sua resposta",
+    "invalidQuestions": "Algumas questões foram geradas incorretamente. Por favor, tente gerar novamente.",
+    "messages": {
+      "excellent": "🎉 Excelente! Continue assim!",
+      "good": "👍 Bom trabalho! Você está no caminho certo.",
+      "improving": "📚 Continue estudando, você está melhorando!",
+      "keepTrying": "💪 Não desista! A prática leva à perfeição."
+    }
   },
   "chat": {
     "sendMessage": "Enviar mensagem",

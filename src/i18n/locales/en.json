@@ -122,7 +122,24 @@
     "apiKeyPlaceholder": "Enter your OpenAI API key",
     "saveApiKey": "Save & Continue",
     "apiKeySaved": "API key saved successfully",
-    "resetTimer": "Timer reset"
+    "resetTimer": "Timer reset",
+    "progress": "Progress",
+    "questionsAnswered": "questions answered",
+    "yourScore": "Your Score",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "reviewWrong": "Review Wrong Questions",
+    "unansweredWarning": "You left {{count}} question(s) unanswered! Do you want to submit anyway?",
+    "correctionSuccess": "Test corrected! You got {{correct}} out of {{total}} questions right.",
+    "correctAnswer": "Correct answer",
+    "yourAnswer": "Your answer",
+    "invalidQuestions": "Some questions were generated incorrectly. Please try generating again.",
+    "messages": {
+      "excellent": "🎉 Excellent! Keep it up!",
+      "good": "👍 Good work! You're on the right track.",
+      "improving": "📚 Keep studying, you're improving!",
+      "keepTrying": "💪 Don't give up! Practice makes perfect."
+    }
   },
   "profile": {
     "title": "Profile",
