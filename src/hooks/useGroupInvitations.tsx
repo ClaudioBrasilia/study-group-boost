@@ -18,10 +18,17 @@ interface Invitation {
   };
 }
 
+interface SearchedUser {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export const useGroupInvitations = () => {
   const { user } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
 
   const fetchPendingInvitations = async () => {
@@ -74,7 +81,53 @@ export const useGroupInvitations = () => {
     };
   }, [user]);
 
-  const sendInvitation = async (groupId: string, email: string) => {
+  const searchUsersByName = async (searchTerm: string): Promise<SearchedUser[]> => {
+    if (!searchTerm || searchTerm.length < 2) {
+      return [];
+    }
+
+    setSearchLoading(true);
+    try {
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('id, name')
+        .ilike('name', `%${searchTerm.trim()}%`)
+        .limit(10);
+
+      if (error) throw error;
+
+      if (!profiles || profiles.length === 0) {
+        return [];
+      }
+
+      const usersWithEmails = await Promise.all(
+        profiles.map(async (profile) => {
+          const { data: email } = await supabase.rpc('get_user_email', {
+            user_uuid: profile.id,
+          });
+
+          return {
+            id: profile.id,
+            name: profile.name,
+            email: email || '',
+          };
+        })
+      );
+
+      return usersWithEmails.filter((u) => u.email);
+    } catch (error: any) {
+      console.error('Error searching users:', error);
+      return [];
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const sendInvitation = async (
+    groupId: string,
+    email: string,
+    userId?: string
+  ) => {
     if (!user) {
       toast.error('Você precisa estar logado');
       return { error: 'Not authenticated' };
@@ -82,19 +135,23 @@ export const useGroupInvitations = () => {
 
     setLoading(true);
     try {
-      // Check if user with this email exists
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', user.id)
-        .single();
+      let targetEmail = email;
+
+      if (userId) {
+        const { data: userEmail } = await supabase.rpc('get_user_email', {
+          user_uuid: userId,
+        });
+        if (userEmail) {
+          targetEmail = userEmail;
+        }
+      }
 
       const { error } = await supabase
         .from('group_invitations')
         .insert({
           group_id: groupId,
           inviter_id: user.id,
-          invitee_email: email.toLowerCase(),
+          invitee_email: targetEmail.toLowerCase(),
         });
 
       if (error) {
@@ -213,7 +270,9 @@ export const useGroupInvitations = () => {
     invitations,
     pendingCount,
     loading,
+    searchLoading,
     sendInvitation,
+    searchUsersByName,
     getGroupInvitations,
     acceptInvitation,
     rejectInvitation,
