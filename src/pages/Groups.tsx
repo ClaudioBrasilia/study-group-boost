@@ -199,7 +199,7 @@ const Groups: React.FC = () => {
 
   return (
     <PageLayout>
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <Input 
             type="text" 
@@ -210,28 +210,42 @@ const Groups: React.FC = () => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         </div>
-        <Button 
-          onClick={() => navigate('/generate-test')}
-          variant="outline"
-          size="icon"
-          className="shrink-0"
-          title="Criar Teste IA"
-        >
-          <FileText size={20} />
-        </Button>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-study-primary shrink-0" size="icon">
-              <Plus size={20} />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t('groups.create')}</DialogTitle>
-            </DialogHeader>
-            <CreateGroupForm onCreateGroup={handleCreateGroup} />
-          </DialogContent>
-        </Dialog>
+        
+        <div className="flex gap-2">
+          {/* Botão Criar Teste IA - COM GATE PREMIUM */}
+          <Button 
+            onClick={() => {
+              if (user?.plan !== 'premium') {
+                toast.error('Recurso exclusivo para usuários Premium');
+                navigate('/plans');
+                return;
+              }
+              navigate('/generate-test');
+            }}
+            variant="outline"
+            className="flex items-center gap-2 border-yellow-500 text-yellow-700 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-950"
+          >
+            <FileText size={18} />
+            <span className="hidden sm:inline">Criar Teste IA</span>
+            <Crown size={14} className="text-yellow-500" />
+          </Button>
+          
+          {/* Botão Criar Grupo */}
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-study-primary flex items-center gap-2">
+                <Plus size={18} />
+                <span className="hidden sm:inline">Criar Grupo</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t('groups.create')}</DialogTitle>
+              </DialogHeader>
+              <CreateGroupForm onCreateGroup={handleCreateGroup} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       
       <div className="space-y-3">
