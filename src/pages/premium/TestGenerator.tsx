@@ -22,9 +22,11 @@ interface Subject {
 
 interface GeneratedQuestion {
   id: number;
+  context?: string;
   question: string;
   options?: string[];
   answer?: string;
+  explanation?: string;
 }
 
 interface TestResult {
@@ -356,6 +358,15 @@ const TestGenerator: React.FC = () => {
                   >
                     <CardContent className="pt-6">
                       <div className="space-y-4">
+                        {/* Context (if exists) */}
+                        {question.context && (
+                          <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg mb-4 text-sm border border-blue-200 dark:border-blue-800">
+                            <p className="text-blue-900 dark:text-blue-100 italic leading-relaxed">
+                              {question.context}
+                            </p>
+                          </div>
+                        )}
+                        
                         <div className="flex items-start justify-between gap-2">
                           <p className="font-medium flex-1">
                             {question.id}. {question.question}
@@ -416,6 +427,15 @@ const TestGenerator: React.FC = () => {
                               })}
                             </div>
                           </RadioGroup>
+                        )}
+                        
+                        {/* Explanation (show after correction) */}
+                        {isCorrected && question.explanation && (
+                          <div className="mt-4 text-sm bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <p className="text-gray-700 dark:text-gray-300">
+                              <strong className="text-primary">💡 Explicação:</strong> {question.explanation}
+                            </p>
+                          </div>
                         )}
                       </div>
                     </CardContent>

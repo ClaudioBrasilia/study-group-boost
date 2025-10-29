@@ -38,18 +38,35 @@ serve(async (req) => {
     }
 
     const subjectNames = subjects.join(", ");
-    const prompt = `Crie ${numQuestions} questões de múltipla escolha sobre ${subjectNames}. 
-      As questões devem ser de dificuldade ${difficulty} para estudantes de vestibular. 
-      Cada questão deve ter 4 alternativas (A, B, C, D) e uma resposta correta. 
-      Retorne apenas um array JSON com objetos no seguinte formato:
-      [
-        {
-          "id": 1,
-          "question": "Texto da questão aqui",
-          "options": ["Opção A", "Opção B", "Opção C", "Opção D"],
-          "answer": "Opção correta aqui"
-        }
-      ]`;
+    const prompt = `Crie ${numQuestions} questões de múltipla escolha sobre ${subjectNames}.
+
+ESPECIFICAÇÕES:
+- Dificuldade: ${difficulty}
+- Estilo: ENEM/Vestibulares (FUVEST, UNICAMP, UFRJ)/Concursos brasileiros recentes
+- Ano base: 2020-2024 (use temas e formatos de provas recentes)
+- Cada questão deve ter:
+  * Texto contextualizador quando aplicável (trecho de notícia, texto literário, gráfico descrito, etc.)
+  * Enunciado claro e direto
+  * 5 alternativas (A, B, C, D, E)
+  * Apenas UMA resposta correta
+  
+TEMAS PRIORITÁRIOS (quando aplicável):
+- Atualidades e acontecimentos recentes no Brasil e mundo (2020-2024)
+- Interdisciplinaridade (conectar diferentes áreas do conhecimento)
+- Problemas reais, contextualizados e aplicáveis
+- Interpretação de textos, gráficos, dados, charges
+
+Formato JSON:
+[
+  {
+    "id": 1,
+    "context": "Texto contextualizador aqui (opcional mas recomendado, 2-4 linhas)",
+    "question": "Enunciado da questão",
+    "options": ["Alternativa A", "Alternativa B", "Alternativa C", "Alternativa D", "Alternativa E"],
+    "answer": "Alternativa correta (texto completo da alternativa)",
+    "explanation": "Breve explicação da resposta correta (1-2 frases)"
+  }
+]`;
 
     console.log('Calling OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -63,7 +80,19 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'Você é um professor especialista em criar questões de múltipla escolha para vestibular. Crie questões detalhadas e informativas. Retorne APENAS o array JSON, sem texto adicional.'
+            content: `Você é um professor especialista em criar questões de múltipla escolha no estilo ENEM, vestibulares (FUVEST, UNICAMP, UFRJ, etc.) e concursos públicos brasileiros.
+
+DIRETRIZES OBRIGATÓRIAS:
+- Base suas questões em provas REAIS recentes (2020-2024) desses exames
+- Use contextualização: textos literários, jornalísticos, charges, gráficos descritos, dados estatísticos
+- Inclua interdisciplinaridade quando apropriado (ex: História + Geografia, Química + Biologia)
+- Evite questões puramente decorativas; priorize raciocínio, interpretação e análise crítica
+- Use linguagem clara, formal e acadêmica típica do ENEM
+- Todas as 5 alternativas devem ser plausíveis e bem elaboradas
+- A resposta correta deve ser única e indiscutível
+- Inclua sempre uma breve explicação da resposta
+
+Retorne APENAS o array JSON, sem texto adicional, markdown ou comentários.`
           },
           {
             role: 'user',
@@ -116,9 +145,11 @@ serve(async (req) => {
     const formattedQuestions = Array.isArray(parsedQuestions) 
       ? parsedQuestions.map((q, index) => ({
           id: q.id || index + 1,
+          context: q.context || null,
           question: q.question || '',
-          options: Array.isArray(q.options) ? q.options : ['A', 'B', 'C', 'D'],
-          answer: q.answer || ''
+          options: Array.isArray(q.options) ? q.options : ['A', 'B', 'C', 'D', 'E'],
+          answer: q.answer || '',
+          explanation: q.explanation || null
         })) 
       : [];
 
