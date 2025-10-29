@@ -185,7 +185,19 @@ const TestGenerator: React.FC = () => {
 
       if (error) {
         console.error('Edge function error:', error);
-        throw new Error(error.message || 'Erro ao gerar questões');
+        
+        // Detectar erros específicos do Lovable AI
+        let errorMessage = 'Erro ao gerar questões. Tente novamente.';
+        
+        if (error.message?.includes('429') || error.message?.toLowerCase().includes('rate limit')) {
+          errorMessage = '⏳ Limite de requisições atingido. Aguarde alguns segundos e tente novamente.';
+        } else if (error.message?.includes('402') || error.message?.toLowerCase().includes('créditos')) {
+          errorMessage = '💳 Créditos Lovable AI esgotados. Adicione créditos em Settings -> Workspace -> Usage.';
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       if (!data || !data.questions) {

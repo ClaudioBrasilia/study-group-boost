@@ -1,7 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,10 +14,10 @@ serve(async (req) => {
   }
 
   try {
-    if (!openAIApiKey) {
-      console.error('OPENAI_API_KEY not configured');
+    if (!lovableApiKey) {
+      console.error('LOVABLE_API_KEY not configured');
       return new Response(
-        JSON.stringify({ error: 'OpenAI API key not configured' }), 
+        JSON.stringify({ error: 'Lovable AI key not configured' }), 
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -68,15 +68,15 @@ Formato JSON:
   }
 ]`;
 
-    console.log('Calling OpenAI API...');
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    console.log('Calling Lovable AI Gateway...');
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'system',
@@ -105,9 +105,32 @@ Retorne APENAS o array JSON, sem texto adicional, markdown ou comentários.`
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('OpenAI API error:', errorData);
+      console.error('Lovable AI error:', errorData);
+      
+      // Rate limit excedido
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Limite de requisições excedido. Aguarde alguns segundos e tente novamente.' }), 
+          { 
+            status: 429, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
+      // Créditos esgotados
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Créditos Lovable AI esgotados. Adicione créditos em Settings -> Workspace -> Usage.' }), 
+          { 
+            status: 402, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        );
+      }
+      
       return new Response(
-        JSON.stringify({ error: `OpenAI API error: ${errorData.error?.message || 'Unknown error'}` }), 
+        JSON.stringify({ error: `Lovable AI error: ${errorData.error?.message || 'Unknown error'}` }), 
         { 
           status: response.status, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
