@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, User, Users, Crown, AlertCircle } from 'lucide-react';
+import { Plus, Search, User, Users, Crown, AlertCircle, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/context/AuthContext';
 import { useGroups } from '@/hooks/useGroups';
@@ -199,7 +199,7 @@ const Groups: React.FC = () => {
 
   return (
     <PageLayout>
-      <div className="mb-4 flex items-center">
+      <div className="mb-4 flex items-center gap-2">
         <div className="relative flex-1">
           <Input 
             type="text" 
@@ -210,9 +210,18 @@ const Groups: React.FC = () => {
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
         </div>
+        <Button 
+          onClick={() => navigate('/generate-test')}
+          variant="outline"
+          size="icon"
+          className="shrink-0"
+          title="Criar Teste IA"
+        >
+          <FileText size={20} />
+        </Button>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button className="ml-2 bg-study-primary" size="icon">
+            <Button className="bg-study-primary shrink-0" size="icon">
               <Plus size={20} />
             </Button>
           </DialogTrigger>
