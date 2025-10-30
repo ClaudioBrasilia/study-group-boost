@@ -4,9 +4,12 @@ import { useAuth } from '@/context/AuthContext';
 
 export interface Achievement {
   id: string;
-  nameKey: string;
-  descriptionKey: string;
+  name_key: string;
+  description_key: string;
+  icon: string;
+  category: string;
   earned: boolean;
+  earned_at?: string;
 }
 
 export interface ProfileStats {
@@ -89,70 +92,24 @@ export function useProfileData() {
 
       const userRank = sortedUsers.findIndex(([userId]) => userId === user.id) + 1;
 
-      // Define achievements based on user stats
-      const achievements: Achievement[] = [
-        {
-          id: '1',
-          nameKey: 'studyWarrior',
-          descriptionKey: 'studyWarrior',
-          earned: totalPoints >= 100
-        },
-        {
-          id: '2',
-          nameKey: 'knowledgeSeeker',
-          descriptionKey: 'knowledgeSeeker',
-          earned: totalPoints >= 500
-        },
-        {
-          id: '3',
-          nameKey: 'groupLeader',
-          descriptionKey: 'groupLeader',
-          earned: groupsCount >= 1
-        },
-        {
-          id: '4',
-          nameKey: 'problemSolver',
-          descriptionKey: 'problemSolver',
-          earned: totalPoints >= 1000
-        },
-        {
-          id: '5',
-          nameKey: 'hydrationMaster',
-          descriptionKey: 'hydrationMaster',
-          earned: false // Will be implemented with water tracking
-        },
-        {
-          id: '6',
-          nameKey: 'dedicationStar',
-          descriptionKey: 'dedicationStar',
-          earned: level >= 10
-        }
-      ];
+      // Fetch achievements from database
+      const { data: allAchievements } = await supabase
+        .from('achievements')
+        .select('*');
 
-      // Check for newly earned achievements and create notifications
-      const previousAchievements = profileStats.achievements;
-      achievements.forEach(async (achievement) => {
-        const wasEarned = previousAchievements.find(a => a.id === achievement.id)?.earned;
-        if (achievement.earned && !wasEarned) {
-          // New achievement unlocked - create notification
-          const achievementNames: { [key: string]: string } = {
-            studyWarrior: 'Guerreiro do Estudo',
-            knowledgeSeeker: 'Buscador de Conhecimento',
-            groupLeader: 'Líder de Grupo',
-            problemSolver: 'Solucionador de Problemas',
-            hydrationMaster: 'Mestre da Hidratação',
-            dedicationStar: 'Estrela da Dedicação'
-          };
-          
-          await supabase.from('notifications').insert({
-            user_id: user.id,
-            type: 'achievement',
-            title: '🏆 Nova conquista desbloqueada!',
-            message: `Você conquistou: ${achievementNames[achievement.nameKey]}`,
-            link: '/profile'
-          });
-        }
-      });
+      const { data: userAchievements } = await supabase
+        .from('user_achievements')
+        .select('achievement_id, earned_at')
+        .eq('user_id', user.id);
+
+      const earnedIds = new Set(userAchievements?.map(ua => ua.achievement_id));
+      const earnedMap = new Map(userAchievements?.map(ua => [ua.achievement_id, ua.earned_at]));
+
+      const achievements: Achievement[] = (allAchievements || []).map(achievement => ({
+        ...achievement,
+        earned: earnedIds.has(achievement.id),
+        earned_at: earnedMap.get(achievement.id)
+      }));
 
       setProfileStats({
         name: profile?.name || 'Usuário',

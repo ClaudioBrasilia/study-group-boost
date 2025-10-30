@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          category: string
+          created_at: string
+          description_key: string
+          groups_required: number | null
+          icon: string
+          id: string
+          name_key: string
+          points_required: number | null
+          sessions_required: number | null
+          water_days_required: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description_key: string
+          groups_required?: number | null
+          icon: string
+          id?: string
+          name_key: string
+          points_required?: number | null
+          sessions_required?: number | null
+          water_days_required?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description_key?: string
+          groups_required?: number | null
+          icon?: string
+          id?: string
+          name_key?: string
+          points_required?: number | null
+          sessions_required?: number | null
+          water_days_required?: number | null
+        }
+        Relationships: []
+      }
       goals: {
         Row: {
           created_at: string
@@ -356,6 +395,35 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_achievements: {
+        Row: {
+          achievement_id: string
+          earned_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          earned_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          earned_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_achievement_id_fkey"
+            columns: ["achievement_id"]
+            isOneToOne: false
+            referencedRelation: "achievements"
             referencedColumns: ["id"]
           },
         ]

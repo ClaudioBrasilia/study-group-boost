@@ -12,20 +12,23 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useAchievements } from '@/hooks/useAchievements';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { AchievementsGrid } from '@/components/profile/AchievementsGrid';
 
 const Profile: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { profileStats, loading } = useProfileData();
+  const { achievements } = useAchievements();
   const { preferences, loading: preferencesLoading, updatePreference } = useUserPreferences();
   
   const handleNotificationChange = (key: keyof typeof preferences) => {
     updatePreference(key, !preferences[key]);
   };
   
-  const earnedAchievements = profileStats?.achievements?.filter(a => a.earned) || [];
-  const unearnedAchievements = profileStats?.achievements?.filter(a => !a.earned) || [];
+  const earnedAchievements = achievements.filter(a => a.earned);
+  const totalAchievements = achievements.length;
 
   if (loading) {
     return (
@@ -118,40 +121,10 @@ const Profile: React.FC = () => {
       
       <Card className="mb-6">
         <CardHeader className="pb-2">
-          <CardTitle className="text-base">{t('profile.achievements')} ({earnedAchievements.length}/{profileStats?.achievements?.length || 0})</CardTitle>
+          <CardTitle className="text-base">{t('profile.achievements')} ({earnedAchievements.length}/{totalAchievements})</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium">{t('profile.earned')}</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {earnedAchievements.map(achievement => (
-                <div key={achievement.id} className="border rounded-lg p-3 bg-muted/50">
-                  <div className="flex items-center mb-1">
-                    <Award size={16} className="text-primary mr-2" />
-                    <span className="font-medium text-sm">{t(`profile.achievementNames.${achievement.nameKey}`)}</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{t(`profile.achievementDescriptions.${achievement.descriptionKey}`)}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          {unearnedAchievements.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium">{t('profile.locked')}</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {unearnedAchievements.map(achievement => (
-                  <div key={achievement.id} className="border rounded-lg p-3 bg-muted/50 opacity-60">
-                    <div className="flex items-center mb-1">
-                      <Award size={16} className="text-muted-foreground mr-2" />
-                      <span className="font-medium text-sm">{t(`profile.achievementNames.${achievement.nameKey}`)}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{t(`profile.achievementDescriptions.${achievement.descriptionKey}`)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        <CardContent>
+          <AchievementsGrid achievements={achievements} />
         </CardContent>
       </Card>
       
