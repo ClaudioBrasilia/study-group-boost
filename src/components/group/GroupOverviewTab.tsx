@@ -53,7 +53,7 @@ const GroupOverviewTab: React.FC<GroupOverviewTabProps> = ({
         <h3 className="font-semibold mb-2">Metas do Grupo</h3>
         <div className="space-y-3">
           {goals.slice(0, 2).map((goal) => (
-            <div key={goal.id} className="flex items-start space-x-3 flex-1 min-w-0">
+            <div key={goal.id} className="flex items-start space-x-3">
               <BookOpen size={18} className="text-gray-400 mt-1 flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
