@@ -12,7 +12,7 @@ export interface WaterStats {
 export function useWaterData() {
   const [waterStats, setWaterStats] = useState<WaterStats>({
     todayIntake: 0,
-    dailyGoal: 2500,
+    dailyGoal: 2500, // Default, will be updated from profile
     weeklyData: []
   });
   const [loading, setLoading] = useState(true);
@@ -31,6 +31,15 @@ export function useWaterData() {
       setLoading(true);
 
       const today = new Date().toISOString().split('T')[0];
+      
+      // Fetch user's water goal from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('water_goal_ml')
+        .eq('id', user.id)
+        .single();
+
+      const dailyGoal = profile?.water_goal_ml || 2500;
       
       // Fetch today's water intake
       const { data: todayData } = await supabase
@@ -67,7 +76,7 @@ export function useWaterData() {
 
       setWaterStats({
         todayIntake,
-        dailyGoal: 2500, // Fixed goal for now
+        dailyGoal,
         weeklyData
       });
 
@@ -151,11 +160,36 @@ export function useWaterData() {
     }
   };
 
+  const updateWaterGoal = async (newGoal: number) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ water_goal_ml: newGoal })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setWaterStats(prev => ({
+        ...prev,
+        dailyGoal: newGoal
+      }));
+
+      toast.success('Meta de água atualizada!');
+    } catch (error) {
+      console.error('Error updating water goal:', error);
+      toast.error('Erro ao atualizar meta de água');
+    }
+  };
+
   return {
     waterStats,
     loading,
     addWaterIntake,
     removeWaterIntake,
+    updateWaterGoal,
     refreshData: fetchWaterData
   };
 }

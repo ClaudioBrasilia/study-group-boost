@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Droplet, Plus, Minus } from 'lucide-react';
+import { Droplet, Plus, Minus, Settings } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import PageLayout from '@/components/layout/PageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,11 +10,40 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
 import { useWaterData } from '@/hooks/useWaterData';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const Water: React.FC = () => {
   const { t } = useTranslation();
-  const { waterStats, loading, addWaterIntake, removeWaterIntake } = useWaterData();
+  const { waterStats, loading, addWaterIntake, removeWaterIntake, updateWaterGoal } = useWaterData();
   const [unitType, setUnitType] = useState('ml');
+  const [goalDialogOpen, setGoalDialogOpen] = useState(false);
+  const [customGoal, setCustomGoal] = useState('');
+
+  const handleSaveGoal = () => {
+    const goalValue = parseInt(customGoal);
+    if (goalValue >= 500 && goalValue <= 5000) {
+      updateWaterGoal(goalValue);
+      setGoalDialogOpen(false);
+      setCustomGoal('');
+    }
+  };
+
+  const quickGoalPresets = [
+    { label: '🪑 Sedentário', value: 2000 },
+    { label: '🚶 Moderado', value: 2500 },
+    { label: '🏃 Ativo', value: 3000 },
+    { label: '🏋️ Muito ativo', value: 3500 },
+  ];
 
   const displayIntake = unitType === 'ml' ? waterStats.todayIntake : (waterStats.todayIntake / 1000).toFixed(1);
   const displayGoal = unitType === 'ml' ? waterStats.dailyGoal : (waterStats.dailyGoal / 1000).toFixed(1);
@@ -67,6 +96,62 @@ const Water: React.FC = () => {
             <div 
               className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBmaWxsPSJub25lIiBzdHJva2U9IiNmZmZmZmYzMCIgc3Ryb2tlLXdpZHRoPSIyIiBkPSJNMCwzMCBDNjAsMzAgOTAsMCA5MCwwIFMxMjAsMzAgMTgwLDMwIEMxODAsMzAgMjEwLDAgMjEwLDAgUzI0MCwzMCAzMDAsMzAgTDMwMCwxMDAgTDAsMTAwIFoiPjwvcGF0aD4KPC9zdmc+Cg==')] opacity-20"
             ></div>
+            <div className="absolute top-2 right-2 z-20">
+              <Dialog open={goalDialogOpen} onOpenChange={setGoalDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Ajustar Meta Diária de Água</DialogTitle>
+                    <DialogDescription>
+                      Escolha uma meta pré-definida ou defina uma personalizada (500ml - 5000ml)
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label>Sugestões baseadas em atividade:</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {quickGoalPresets.map((preset) => (
+                          <Button
+                            key={preset.value}
+                            variant="outline"
+                            onClick={() => {
+                              updateWaterGoal(preset.value);
+                              setGoalDialogOpen(false);
+                            }}
+                            className="h-auto py-3 flex flex-col items-center text-xs"
+                          >
+                            <span>{preset.label}</span>
+                            <span className="font-bold">{preset.value}ml</span>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="custom-goal">Meta personalizada (ml):</Label>
+                      <Input
+                        id="custom-goal"
+                        type="number"
+                        min="500"
+                        max="5000"
+                        step="100"
+                        placeholder="2500"
+                        value={customGoal}
+                        onChange={(e) => setCustomGoal(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={handleSaveGoal} disabled={!customGoal || parseInt(customGoal) < 500 || parseInt(customGoal) > 5000}>
+                      Salvar Meta
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
             <div className="relative z-10 flex flex-col items-center">
               <div className="mb-2 text-center">
                 <div className="text-xs text-blue-100">{t('water.todaysIntake')}</div>

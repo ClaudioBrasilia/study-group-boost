@@ -243,6 +243,7 @@ export type Database = {
           name: string
           plan: string
           updated_at: string
+          water_goal_ml: number
         }
         Insert: {
           created_at?: string
@@ -250,6 +251,7 @@ export type Database = {
           name: string
           plan?: string
           updated_at?: string
+          water_goal_ml?: number
         }
         Update: {
           created_at?: string
@@ -257,6 +259,7 @@ export type Database = {
           name?: string
           plan?: string
           updated_at?: string
+          water_goal_ml?: number
         }
         Relationships: []
       }

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/sonner';
 import { Input } from '@/components/ui/input';
@@ -18,6 +18,8 @@ import { Link } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
 import PageLayout from '@/components/layout/PageLayout';
+import { Droplet } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 const ProfileSettings: React.FC = () => {
   const { user, updateUserPlan } = useAuth();
@@ -29,6 +31,33 @@ const ProfileSettings: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [waterGoal, setWaterGoal] = useState('2500');
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('name, water_goal_ml')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+      return;
+    }
+
+    if (data) {
+      setName(data.name || '');
+      setWaterGoal(data.water_goal_ml?.toString() || '2500');
+    }
+  };
   
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,10 +66,20 @@ const ProfileSettings: React.FC = () => {
     try {
       if (!user) throw new Error('No user found');
 
+      const goalValue = parseInt(waterGoal);
+      if (goalValue < 500 || goalValue > 5000) {
+        toast.error('Meta de água deve estar entre 500ml e 5000ml');
+        setIsUpdating(false);
+        return;
+      }
+
       // Update profile in Supabase
       const { error } = await supabase
         .from('profiles')
-        .update({ name })
+        .update({ 
+          name,
+          water_goal_ml: goalValue
+        })
         .eq('id', user.id);
 
       if (error) throw error;
@@ -123,9 +162,34 @@ const ProfileSettings: React.FC = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                disabled
+                className="bg-muted"
                 placeholder="seu@email.com"
               />
+              <p className="text-xs text-muted-foreground">
+                O email não pode ser alterado
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <Label htmlFor="water-goal" className="flex items-center gap-2">
+                <Droplet className="w-4 h-4 text-blue-500" />
+                Meta Diária de Água (ml)
+              </Label>
+              <Input
+                id="water-goal"
+                type="number"
+                min="500"
+                max="5000"
+                step="100"
+                value={waterGoal}
+                onChange={(e) => setWaterGoal(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Recomendado: 2000ml-3500ml dependendo da atividade física
+              </p>
             </div>
             
             <Button 
