@@ -83,13 +83,13 @@ const GroupDetail: React.FC = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full mb-6">
-          <TabsTrigger value="overview" className="flex-1">Visão Geral</TabsTrigger>
-          <TabsTrigger value="subjects" className="flex-1">Matérias</TabsTrigger>
-          <TabsTrigger value="members" className="flex-1">Membros</TabsTrigger>
-          <TabsTrigger value="messages" className="flex-1">Mensagens</TabsTrigger>
-          <TabsTrigger value="files" className="flex-1">Arquivos</TabsTrigger>
-          <TabsTrigger value="goals" className="flex-1">Metas</TabsTrigger>
+        <TabsList className="w-full mb-6 flex flex-wrap gap-2 justify-start">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="subjects">Matérias</TabsTrigger>
+          <TabsTrigger value="members">Membros</TabsTrigger>
+          <TabsTrigger value="messages">Mensagens</TabsTrigger>
+          <TabsTrigger value="files">Arquivos</TabsTrigger>
+          <TabsTrigger value="goals">Metas</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
