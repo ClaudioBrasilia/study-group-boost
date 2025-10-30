@@ -53,10 +53,10 @@ const GroupOverviewTab: React.FC<GroupOverviewTabProps> = ({
         <h3 className="font-semibold mb-2">Metas do Grupo</h3>
         <div className="space-y-3">
           {goals.slice(0, 2).map((goal) => (
-            <div key={goal.id} className="flex items-start space-x-3">
-              <BookOpen size={18} className="text-gray-400 mt-1" />
-              <div className="w-full">
-                <p className="text-sm font-medium">
+            <div key={goal.id} className="flex items-start space-x-3 flex-1 min-w-0">
+              <BookOpen size={18} className="text-gray-400 mt-1 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">
                   {getSubjectNameById(goal.subject)} - 
                   {goal.type === 'exercises' ? ' Exercícios' : 
                     goal.type === 'pages' ? ' Páginas' : ' Tempo (min)'}
@@ -64,7 +64,7 @@ const GroupOverviewTab: React.FC<GroupOverviewTabProps> = ({
                 <div className="w-full bg-gray-200 h-2 rounded-full mt-1">
                   <div 
                     className="bg-study-primary h-2 rounded-full" 
-                    style={{ width: `${(goal.current / goal.target) * 100}%` }}
+                    style={{ width: `${Math.min((goal.current / goal.target) * 100, 100)}%` }}
                   ></div>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
