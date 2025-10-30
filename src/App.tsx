@@ -24,6 +24,7 @@ import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import ProfileSettings from "./components/profile/ProfileSettings";
 import Invitations from "./pages/Invitations";
+import Notifications from "./pages/Notifications";
 import SplashScreen from "./components/SplashScreen";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import "./i18n";
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="/groups" element={<ProtectedRoute><Groups /></ProtectedRoute>} />
             <Route path="/group/:groupId" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
             <Route path="/invitations" element={<ProtectedRoute><Invitations /></ProtectedRoute>} />
+            <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
             <Route path="/group/:groupId/progress" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
             <Route path="/timer" element={<ProtectedRoute><Timer /></ProtectedRoute>} />

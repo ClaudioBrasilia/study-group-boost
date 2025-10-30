@@ -129,6 +129,31 @@ export function useProfileData() {
         }
       ];
 
+      // Check for newly earned achievements and create notifications
+      const previousAchievements = profileStats.achievements;
+      achievements.forEach(async (achievement) => {
+        const wasEarned = previousAchievements.find(a => a.id === achievement.id)?.earned;
+        if (achievement.earned && !wasEarned) {
+          // New achievement unlocked - create notification
+          const achievementNames: { [key: string]: string } = {
+            studyWarrior: 'Guerreiro do Estudo',
+            knowledgeSeeker: 'Buscador de Conhecimento',
+            groupLeader: 'Líder de Grupo',
+            problemSolver: 'Solucionador de Problemas',
+            hydrationMaster: 'Mestre da Hidratação',
+            dedicationStar: 'Estrela da Dedicação'
+          };
+          
+          await supabase.from('notifications').insert({
+            user_id: user.id,
+            type: 'achievement',
+            title: '🏆 Nova conquista desbloqueada!',
+            message: `Você conquistou: ${achievementNames[achievement.nameKey]}`,
+            link: '/profile'
+          });
+        }
+      });
+
       setProfileStats({
         name: profile?.name || 'Usuário',
         points: totalPoints,

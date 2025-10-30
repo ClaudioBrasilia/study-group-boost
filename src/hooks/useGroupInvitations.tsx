@@ -146,13 +146,15 @@ export const useGroupInvitations = () => {
         }
       }
 
-      const { error } = await supabase
+      const { data: invitationData, error } = await supabase
         .from('group_invitations')
         .insert({
           group_id: groupId,
           inviter_id: user.id,
           invitee_email: targetEmail.toLowerCase(),
-        });
+        })
+        .select()
+        .single();
 
       if (error) {
         if (error.code === '23505') {
@@ -161,6 +163,23 @@ export const useGroupInvitations = () => {
           throw error;
         }
         return { error };
+      }
+
+      // Create notification for the invitee if they have an account
+      if (userId && invitationData) {
+        const { data: groupData } = await supabase
+          .from('groups')
+          .select('name')
+          .eq('id', groupId)
+          .single();
+
+        await supabase.from('notifications').insert({
+          user_id: userId,
+          type: 'invitation',
+          title: '📬 Novo convite de grupo',
+          message: `Você foi convidado para ${groupData?.name || 'um grupo de estudo'}`,
+          link: '/invitations'
+        });
       }
 
       toast.success('Convite enviado com sucesso!');
