@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { toast } from '@/components/ui/sonner';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -213,22 +214,32 @@ const Groups: React.FC = () => {
         
         <div className="flex gap-2">
           {/* Botão Criar Teste IA - COM GATE PREMIUM */}
-          <Button 
-            onClick={() => {
-              if (user?.plan !== 'premium') {
-                toast.error('Recurso exclusivo para usuários Premium');
-                navigate('/plans');
-                return;
-              }
-              navigate('/generate-test');
-            }}
-            variant="outline"
-            className="flex items-center gap-2 border-yellow-500 text-yellow-700 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-950"
-          >
-            <FileText size={18} />
-            <span className="hidden sm:inline">Criar Teste IA</span>
-            <Crown size={14} className="text-yellow-500" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  onClick={() => {
+                    if (user?.plan !== 'premium') {
+                      toast.error('Recurso exclusivo para usuários Premium');
+                      navigate('/plans');
+                      return;
+                    }
+                    navigate('/generate-test');
+                  }}
+                  variant="outline"
+                  className="flex items-center gap-2 border-yellow-500 text-yellow-700 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-950"
+                >
+                  <FileText size={18} />
+                  <span>Criar Teste IA</span>
+                  <Crown size={14} className="text-yellow-500" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Gere testes personalizados com Inteligência Artificial</p>
+                <p className="text-xs text-yellow-600 dark:text-yellow-500">🔒 Exclusivo Premium</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           
           {/* Botão Criar Grupo */}
           <Dialog open={open} onOpenChange={setOpen}>
