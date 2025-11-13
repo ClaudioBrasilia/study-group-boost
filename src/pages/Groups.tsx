@@ -243,12 +243,21 @@ const Groups: React.FC = () => {
           
           {/* Botão Criar Grupo */}
           <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-study-primary flex items-center gap-2">
-                <Plus size={18} />
-                <span className="hidden sm:inline">Criar Grupo</span>
-              </Button>
-            </DialogTrigger>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DialogTrigger asChild>
+                    <Button className="bg-study-primary flex items-center gap-2">
+                      <Plus size={18} />
+                      <span className="hidden sm:inline">Criar Grupo</span>
+                    </Button>
+                  </DialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Criar um novo grupo de estudo</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>{t('groups.create')}</DialogTitle>
