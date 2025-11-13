@@ -17,7 +17,10 @@ const ProgressPage: React.FC = () => {
   const { t } = useTranslation();
   const { groupId } = useParams();
   
-  const { stats, loading } = useProgressData(view === 'group' ? groupId : undefined);
+  const { stats, loading } = useProgressData(
+    view === 'group' ? groupId : undefined,
+    timeRange as 'week' | 'month' | 'year'
+  );
   
   if (loading) {
     return (
