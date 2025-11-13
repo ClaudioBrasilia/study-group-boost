@@ -37,7 +37,7 @@ export interface GoalProgressData {
 
 const COLORS = ['hsl(265, 85%, 75%)', 'hsl(265, 53%, 64%)', 'hsl(195, 85%, 60%)', 'hsl(122, 39%, 49%)', 'hsl(45, 100%, 51%)'];
 
-export function useProgressData(groupId?: string) {
+export function useProgressData(groupId?: string, timeRange: 'week' | 'month' | 'year' = 'week') {
   const [stats, setStats] = useState<ProgressStats>({
     totalStudyTime: 0,
     totalPages: 0,
@@ -54,7 +54,7 @@ export function useProgressData(groupId?: string) {
     if (user) {
       fetchProgressData();
     }
-  }, [user, groupId]);
+  }, [user, groupId, timeRange]);
 
   const fetchProgressData = async () => {
     if (!user) return;
@@ -62,9 +62,19 @@ export function useProgressData(groupId?: string) {
     try {
       setLoading(true);
 
-      // Fetch study sessions for the last 7 days
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      // Fetch study sessions based on selected time range
+      const startDate = new Date();
+      switch (timeRange) {
+        case 'week':
+          startDate.setDate(startDate.getDate() - 7);
+          break;
+        case 'month':
+          startDate.setMonth(startDate.getMonth() - 1);
+          break;
+        case 'year':
+          startDate.setFullYear(startDate.getFullYear() - 1);
+          break;
+      }
       
       const { data: sessions } = await supabase
         .from('study_sessions')
@@ -76,7 +86,7 @@ export function useProgressData(groupId?: string) {
           )
         `)
         .eq('user_id', user.id)
-        .gte('started_at', sevenDaysAgo.toISOString())
+        .gte('started_at', startDate.toISOString())
         .not('completed_at', 'is', null);
 
       // Calculate weekly data
