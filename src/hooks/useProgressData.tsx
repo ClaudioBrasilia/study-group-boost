@@ -66,6 +66,32 @@ export function useProgressData(groupId?: string, timeRange: 'day' | 'week' | 'm
     }
   }, [user, groupId, timeRange]);
 
+  // Atualização em tempo real
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('study_sessions_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Ouve INSERT, UPDATE e DELETE
+          schema: 'public',
+          table: 'study_sessions',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('📡 Atualização em tempo real detectada:', payload);
+          fetchProgressData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, groupId, timeRange]);
+
   const fetchProgressData = async () => {
     if (!user) return;
 
