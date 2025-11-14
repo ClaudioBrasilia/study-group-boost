@@ -10,6 +10,16 @@ export interface ProgressStats {
   weeklyData: WeeklyStudyData[];
   subjectData: SubjectProgressData[];
   goalsProgress: GoalProgressData[];
+  dailySessions?: DailySessionData[];
+}
+
+export interface DailySessionData {
+  id: string;
+  startTime: string;
+  endTime: string;
+  duration: number;
+  subject: string;
+  subjectColor: string;
 }
 
 export interface WeeklyStudyData {
@@ -37,7 +47,7 @@ export interface GoalProgressData {
 
 const COLORS = ['hsl(265, 85%, 75%)', 'hsl(265, 53%, 64%)', 'hsl(195, 85%, 60%)', 'hsl(122, 39%, 49%)', 'hsl(45, 100%, 51%)'];
 
-export function useProgressData(groupId?: string, timeRange: 'week' | 'month' | 'year' = 'week') {
+export function useProgressData(groupId?: string, timeRange: 'day' | 'week' | 'month' | 'year' = 'week') {
   const [stats, setStats] = useState<ProgressStats>({
     totalStudyTime: 0,
     totalPages: 0,
@@ -65,6 +75,9 @@ export function useProgressData(groupId?: string, timeRange: 'week' | 'month' | 
       // Fetch study sessions based on selected time range
       const startDate = new Date();
       switch (timeRange) {
+        case 'day':
+          startDate.setHours(0, 0, 0, 0);
+          break;
         case 'week':
           startDate.setDate(startDate.getDate() - 7);
           break;
@@ -106,6 +119,9 @@ export function useProgressData(groupId?: string, timeRange: 'week' | 'month' | 
       // Fetch goals progress (only for group view)
       const goalsProgress = groupId ? await fetchGoalsProgress(groupId) : [];
 
+      // Fetch daily sessions (only for day view)
+      const dailySessions = timeRange === 'day' ? await fetchDailySessions() : [];
+
       setStats({
         totalStudyTime,
         totalPages,
@@ -113,7 +129,8 @@ export function useProgressData(groupId?: string, timeRange: 'week' | 'month' | 
         studyStreak,
         weeklyData,
         subjectData,
-        goalsProgress
+        goalsProgress,
+        dailySessions
       });
     } catch (error) {
       console.error('Error fetching progress data:', error);
@@ -193,6 +210,50 @@ export function useProgressData(groupId?: string, timeRange: 'week' | 'month' | 
       current: goal.current,
       target: goal.target,
       progress: Math.round((goal.current / goal.target) * 100)
+    }));
+  };
+
+  const fetchDailySessions = async (): Promise<DailySessionData[]> => {
+    if (!user) return [];
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const { data: sessions } = await supabase
+      .from('study_sessions')
+      .select(`
+        id,
+        started_at,
+        completed_at,
+        duration_minutes,
+        subjects:subject_id (
+          id,
+          name
+        )
+      `)
+      .eq('user_id', user.id)
+      .gte('started_at', today.toISOString())
+      .lt('started_at', tomorrow.toISOString())
+      .not('completed_at', 'is', null)
+      .order('started_at', { ascending: true });
+
+    return (sessions || []).map((session, index) => ({
+      id: session.id,
+      startTime: new Date(session.started_at).toLocaleTimeString('pt-BR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }),
+      endTime: session.completed_at 
+        ? new Date(session.completed_at).toLocaleTimeString('pt-BR', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })
+        : '-',
+      duration: session.duration_minutes,
+      subject: session.subjects?.name || 'Sem matéria',
+      subjectColor: COLORS[index % COLORS.length]
     }));
   };
 

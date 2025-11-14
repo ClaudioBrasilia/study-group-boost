@@ -19,7 +19,7 @@ const ProgressPage: React.FC = () => {
   
   const { stats, loading } = useProgressData(
     view === 'group' ? groupId : undefined,
-    timeRange as 'week' | 'month' | 'year'
+    timeRange as 'day' | 'week' | 'month' | 'year'
   );
   
   if (loading) {
@@ -70,7 +70,8 @@ const ProgressPage: React.FC = () => {
             </Tabs>
             
             <Tabs value={timeRange} onValueChange={setTimeRange} className="w-auto">
-              <TabsList className="grid grid-cols-3 h-9">
+              <TabsList className="grid grid-cols-4 h-9">
+                <TabsTrigger value="day" className="text-xs">Dia</TabsTrigger>
                 <TabsTrigger value="week" className="text-xs">{t('leaderboard.week')}</TabsTrigger>
                 <TabsTrigger value="month" className="text-xs">{t('leaderboard.month')}</TabsTrigger>
                 <TabsTrigger value="year" className="text-xs">Ano</TabsTrigger>
@@ -166,8 +167,71 @@ const ProgressPage: React.FC = () => {
           </Card>
         )}
         
-        {/* Charts */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        {/* Daily Sessions View - Only shown when timeRange === 'day' */}
+        {timeRange === 'day' && stats.dailySessions && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Sessões de Estudo de Hoje
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {stats.dailySessions.length > 0 ? (
+                <div className="space-y-3">
+                  {stats.dailySessions.map((session) => (
+                    <div 
+                      key={session.id} 
+                      className="flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: session.subjectColor }}
+                        ></div>
+                        <div>
+                          <p className="font-medium text-sm">{session.subject}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {session.startTime} - {session.endTime}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-semibold text-primary">{session.duration} min</p>
+                        <p className="text-xs text-muted-foreground">
+                          {Math.floor(session.duration / 5) * 2} páginas
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* Summary of the day */}
+                  <div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Total de Hoje</span>
+                      <div className="text-right">
+                        <p className="font-bold text-lg text-primary">{stats.totalStudyTime} min</p>
+                        <p className="text-xs text-muted-foreground">
+                          {stats.dailySessions.length} {stats.dailySessions.length === 1 ? 'sessão' : 'sessões'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Clock className="mx-auto h-12 w-12 opacity-50 mb-3" />
+                  <p className="text-sm">Nenhuma sessão de estudo registrada hoje</p>
+                  <p className="text-xs mt-1">Inicie uma sessão no Timer para começar!</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Charts - Hide when in daily view */}
+        {timeRange !== 'day' && (
+          <div className="grid gap-6 lg:grid-cols-2">
           <Card className="bg-gradient-to-br from-card to-card/50 border-border/50 shadow-lg">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -252,6 +316,7 @@ const ProgressPage: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+        )}
         
         {/* Subject Distribution */}
         {stats.subjectData.length > 0 && (
