@@ -1,26 +1,59 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Calendar, Target, TrendingUp, Award, Clock, BookOpen, Users } from 'lucide-react';
+import { Calendar, Target, TrendingUp, Award, Clock, BookOpen, Users, RefreshCw } from 'lucide-react';
 import PageLayout from '@/components/layout/PageLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
 import { useProgressData } from '@/hooks/useProgressData';
 import { useParams } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 
 const ProgressPage: React.FC = () => {
   const [timeRange, setTimeRange] = useState('week');
   const [view, setView] = useState<'individual' | 'group'>('individual');
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const { t } = useTranslation();
   const { groupId } = useParams();
+  const { toast } = useToast();
   
-  const { stats, loading } = useProgressData(
+  const { stats, loading, refreshData } = useProgressData(
     view === 'group' ? groupId : undefined,
     timeRange as 'day' | 'week' | 'month' | 'year'
   );
+
+  // Auto-refresh quando a página ganha foco
+  useEffect(() => {
+    const handleFocus = () => {
+      refreshData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [refreshData]);
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshData();
+      toast({
+        title: "Atualizado",
+        description: "Progresso atualizado com sucesso",
+      });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar os dados",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   
   if (loading) {
     return (
@@ -54,6 +87,15 @@ const ProgressPage: React.FC = () => {
           </div>
           
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleManualRefresh}
+              disabled={isRefreshing}
+              className="h-9 w-9"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </Button>
             <Tabs value={view} onValueChange={(value) => setView(value as 'individual' | 'group')} className="w-auto">
               <TabsList className="grid grid-cols-2 h-9">
                 <TabsTrigger value="individual" className="text-xs flex items-center gap-1">
