@@ -25,7 +25,6 @@ const GroupDetail: React.FC = () => {
     subjects,
     newSubject,
     setNewSubject,
-    isVestibularGroup,
     files,
     goals,
     newGoalSubject,
@@ -66,7 +65,7 @@ const GroupDetail: React.FC = () => {
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold text-study-primary">
-            {isVestibularGroup ? t('groups.fixedGroups.vestibularBrasil') : (groupName || `Grupo ${groupId}`)}
+            {groupName || `Grupo ${groupId}`}
           </h1>
           <div className="flex items-center">
             <div className="bg-study-primary text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -74,12 +73,6 @@ const GroupDetail: React.FC = () => {
             </div>
           </div>
         </div>
-        
-        {isVestibularGroup && (
-          <p className="text-gray-500 mt-1">
-            Grupo dedicado à preparação para vestibulares brasileiros
-          </p>
-        )}
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -95,7 +88,6 @@ const GroupDetail: React.FC = () => {
         <TabsContent value="overview">
           <GroupOverviewTab
             goals={goals}
-            isVestibularGroup={isVestibularGroup}
             getSubjectNameById={getSubjectNameById}
             onViewAllGoals={() => setActiveTab('goals')}
             groupId={groupId || ''}
@@ -105,7 +97,6 @@ const GroupDetail: React.FC = () => {
         <TabsContent value="subjects">
           <GroupSubjectsTab
             subjects={subjects}
-            isVestibularGroup={isVestibularGroup}
             currentUserIsAdmin={currentUserIsAdmin}
             newSubject={newSubject}
             setNewSubject={setNewSubject}
@@ -142,22 +133,22 @@ const GroupDetail: React.FC = () => {
           <GroupFilesTab groupId={groupId} />
         </TabsContent>
 
-        <TabsContent value="goals">
-          <GroupGoalsTab
-            goals={goals}
-            subjects={subjects}
-            isVestibularGroup={isVestibularGroup}
-            newGoalSubject={newGoalSubject}
-            setNewGoalSubject={setNewGoalSubject}
-            newGoalType={newGoalType}
-            setNewGoalType={setNewGoalType}
-            newGoalTarget={newGoalTarget}
-            setNewGoalTarget={setNewGoalTarget}
-            handleAddGoal={handleAddGoal}
-            getSubjectNameById={getSubjectNameById}
-            updateGoalProgress={updateGoalProgress}
-          />
-        </TabsContent>
+            <TabsContent value="goals">
+              <GroupGoalsTab
+                goals={goals}
+                subjects={subjects}
+                isAdmin={currentUserIsAdmin}
+                newGoalSubject={newGoalSubject}
+                setNewGoalSubject={setNewGoalSubject}
+                newGoalType={newGoalType}
+                setNewGoalType={setNewGoalType}
+                newGoalTarget={newGoalTarget}
+                setNewGoalTarget={setNewGoalTarget}
+                handleAddGoal={handleAddGoal}
+                getSubjectNameById={getSubjectNameById}
+                updateGoalProgress={updateGoalProgress}
+              />
+            </TabsContent>
       </Tabs>
     </PageLayout>
   );

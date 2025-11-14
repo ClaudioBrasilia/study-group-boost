@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 
 interface GroupSubjectsTabProps {
   subjects: Subject[];
-  isVestibularGroup: boolean;
   currentUserIsAdmin: boolean;
   newSubject: string;
   setNewSubject: (value: string) => void;
@@ -27,7 +26,6 @@ interface GroupSubjectsTabProps {
 
 const GroupSubjectsTab: React.FC<GroupSubjectsTabProps> = ({
   subjects,
-  isVestibularGroup,
   currentUserIsAdmin,
   newSubject,
   setNewSubject,
@@ -47,7 +45,7 @@ const GroupSubjectsTab: React.FC<GroupSubjectsTabProps> = ({
       <div className="flex justify-between items-center">
         <h3 className="font-semibold">Matérias Disponíveis</h3>
         
-        {!isVestibularGroup && currentUserIsAdmin && (
+        {currentUserIsAdmin && (
           <div className="flex gap-2">
             <Dialog>
               <DialogTrigger asChild>
@@ -114,7 +112,7 @@ const GroupSubjectsTab: React.FC<GroupSubjectsTabProps> = ({
                 </Label>
               </div>
               
-              {!isVestibularGroup && currentUserIsAdmin && (
+              {currentUserIsAdmin && (
                 <Button 
                   variant="ghost" 
                   size="icon" 

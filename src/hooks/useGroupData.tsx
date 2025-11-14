@@ -119,9 +119,6 @@ export const useGroupData = (groupId: string | undefined) => {
     
     setLoading(true);
     try {
-      // Check if this is the fixed Vestibular Brasil group
-      setIsVestibularGroup(groupId === 'vestibular-brasil');
-      
       // Fetch group information
       const { data: groupData } = await supabase
         .from('groups')
@@ -246,7 +243,7 @@ export const useGroupData = (groupId: string | undefined) => {
   const handleAddSubject = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newSubject.trim() || isVestibularGroup || !groupId || !user || !currentUserIsAdmin) return;
+    if (!newSubject.trim() || !groupId || !user || !currentUserIsAdmin) return;
     
     try {
       const { data, error } = await supabase
@@ -276,8 +273,6 @@ export const useGroupData = (groupId: string | undefined) => {
   };
 
   const handleDeleteSubject = (subjectId: string) => {
-    if (isVestibularGroup) return;
-    
     setSubjectToDelete(subjectId);
     setDeleteConfirmOpen(true);
   };
@@ -306,7 +301,7 @@ export const useGroupData = (groupId: string | undefined) => {
   };
 
   const handleAddVestibularModule = async () => {
-    if (isVestibularGroup || !groupId || !user || !currentUserIsAdmin) return;
+    if (!groupId || !user || !currentUserIsAdmin) return;
     
     try {
       const vestibularSubjects = [
@@ -560,7 +555,6 @@ export const useGroupData = (groupId: string | undefined) => {
     setSubjects,
     newSubject,
     setNewSubject,
-    isVestibularGroup,
     files,
     goals,
     newGoalSubject,
