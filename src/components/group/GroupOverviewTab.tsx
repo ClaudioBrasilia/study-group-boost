@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 interface GroupOverviewTabProps {
   goals: GoalType[];
-  isVestibularGroup: boolean;
   getSubjectNameById: (id: string) => string;
   onViewAllGoals: () => void;
   groupId: string;
@@ -14,7 +13,6 @@ interface GroupOverviewTabProps {
 
 const GroupOverviewTab: React.FC<GroupOverviewTabProps> = ({ 
   goals, 
-  isVestibularGroup, 
   getSubjectNameById, 
   onViewAllGoals,
   groupId 
@@ -74,9 +72,10 @@ const GroupOverviewTab: React.FC<GroupOverviewTabProps> = ({
             </div>
           ))}
         </div>
-        {!isVestibularGroup && (
-          <Button className="mt-4 w-full" onClick={onViewAllGoals}>Ver Todas as Metas</Button>
-        )}
+        
+        <Button className="mt-4 w-full" onClick={onViewAllGoals}>
+          Ver Todas as Metas
+        </Button>
       </div>
     </div>
   );

@@ -8,8 +8,6 @@ export interface Group {
   name: string;
   description: string;
   members: number;
-  isFixed?: boolean;
-  isPremium?: boolean;
   type: string;
   creator_id: string;
   created_at: string;
@@ -65,29 +63,10 @@ export const useGroups = () => {
           return {
             ...group,
             members: count || 0,
-            isFixed: group.id === 'b47ac10b-58cc-4372-a567-0e02b2c3d479',
-            isPremium: group.id === 'b47ac10b-58cc-4372-a567-0e02b2c3d479',
             isMember: !!membership
           };
         })
       );
-
-      // Add the fixed Vestibular Brasil group if it doesn't exist
-      const hasVestibularGroup = groupsWithCounts.find(g => g.id === 'b47ac10b-58cc-4372-a567-0e02b2c3d479');
-      if (!hasVestibularGroup) {
-        groupsWithCounts.unshift({
-          id: 'b47ac10b-58cc-4372-a567-0e02b2c3d479',
-          name: 'Vestibular Brasil',
-          description: 'Grupo oficial para estudantes se preparando para vestibulares brasileiros',
-          members: 120,
-          isFixed: true,
-          isPremium: true,
-          type: 'vestibular',
-          creator_id: 'system',
-          created_at: new Date().toISOString(),
-          isMember: false
-        });
-      }
 
       setGroups(groupsWithCounts);
     } catch (error) {
@@ -101,12 +80,21 @@ export const useGroups = () => {
   const createGroup = async (name: string, description: string) => {
     if (!user) return { success: false, error: 'Usuário não autenticado' };
 
-    // Check if free user is trying to create a group
-    if (user.plan === 'free') {
-      return { success: false, error: 'Criar grupos requer uma assinatura paga' };
-    }
-
     try {
+      // Check group creation limits based on plan
+      const { count: groupCount } = await supabase
+        .from('groups')
+        .select('*', { count: 'exact', head: true })
+        .eq('creator_id', user.id);
+
+      const maxGroups = user.plan === 'free' ? 1 : 50;
+      
+      if (groupCount !== null && groupCount >= maxGroups) {
+        return { 
+          success: false, 
+          error: `Limite de ${maxGroups} grupo(s) atingido. ${user.plan === 'free' ? 'Assine Premium para criar até 50 grupos.' : ''}` 
+        };
+      }
       // Check for duplicate group name
       const { data: existingGroup } = await supabase
         .from('groups')
@@ -169,18 +157,36 @@ export const useGroups = () => {
         return { success: false, error: 'Você já é membro deste grupo' };
       }
 
-      // Check if group is premium
+      // Check member limit for the group
       const { data: groupData } = await supabase
         .from('groups')
-        .select('id')
+        .select('creator_id')
         .eq('id', groupId)
         .single();
 
-      // Check if it's the Vestibular Brasil group (premium)
-      const isPremiumGroup = groupId === 'b47ac10b-58cc-4372-a567-0e02b2c3d479';
+      if (!groupData) {
+        return { success: false, error: 'Grupo não encontrado' };
+      }
+
+      // Get creator's plan to determine member limit
+      const { data: creatorProfile } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', groupData.creator_id)
+        .single();
+
+      const { count: memberCount } = await supabase
+        .from('group_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('group_id', groupId);
+
+      const maxMembers = creatorProfile?.plan === 'free' ? 5 : 20;
       
-      if (isPremiumGroup && user.plan !== 'premium') {
-        return { success: false, error: 'Este é um grupo exclusivo para usuários Premium' };
+      if (memberCount !== null && memberCount >= maxMembers) {
+        return { 
+          success: false, 
+          error: `Este grupo atingiu o limite de ${maxMembers} membros.` 
+        };
       }
 
       // Add user as member

@@ -82,6 +82,32 @@ export const useGroupFiles = (groupId: string | undefined) => {
     try {
       setUploading(true);
 
+      // Get user's plan
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', user.id)
+        .single();
+
+      // Check if free user is trying to upload (blocked)
+      if (profile?.plan === 'free') {
+        toast.error('Upload de arquivos disponível apenas para usuários Premium');
+        return { success: false, error: 'Upload restrito ao plano Premium' };
+      }
+
+      // Check file count limits for Premium users
+      const { count: fileCount } = await supabase
+        .from('group_files')
+        .select('*', { count: 'exact', head: true })
+        .eq('group_id', groupId);
+
+      const maxFiles = 999; // Practically unlimited for Premium
+
+      if (fileCount !== null && fileCount >= maxFiles) {
+        toast.error(`Limite de ${maxFiles} arquivos atingido.`);
+        return { success: false, error: 'Limite de arquivos atingido' };
+      }
+
       // Validate file size (max 10MB)
       const maxSize = 10 * 1024 * 1024; // 10MB
       if (file.size > maxSize) {

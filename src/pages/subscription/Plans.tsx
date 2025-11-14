@@ -25,30 +25,51 @@ const Plans: React.FC = () => {
     navigate('/groups');
   };
 
+
   const plans = [
-    {
-      id: 'free' as PlanType,
-      name: t('plans.free.name'),
-      price: t('plans.free.price'),
-      features: t('plans.free.features', { returnObjects: true }) as string[],
-      isCurrent: user?.plan === 'free'
-    },
-    {
-      id: 'basic' as PlanType,
-      name: t('plans.basic.name'),
-      price: t('plans.basic.price'),
-      features: t('plans.basic.features', { returnObjects: true }) as string[],
-      isCurrent: user?.plan === 'basic'
-    },
-    {
-      id: 'premium' as PlanType,
-      name: t('plans.premium.name'),
-      price: t('plans.premium.price'),
-      features: t('plans.premium.features', { returnObjects: true }) as string[],
-      isCurrent: user?.plan === 'premium',
-      exclusiveFeatures: ['Vestibular Brasil']
-    }
-  ];
+      {
+        id: 'free' as PlanType,
+        name: 'Free',
+        price: 'R$ 0',
+        features: [
+          'Acesso básico ao app',
+          'Timer de estudos',
+          'Controle de água',
+          'Progresso individual',
+          '1 grupo (até 5 membros)',
+        ],
+        isCurrent: user?.plan === 'free'
+      },
+      {
+        id: 'basic' as PlanType,
+        name: 'Basic',
+        price: 'R$ 9,90/mês',
+        features: [
+          'Tudo do plano Free',
+          'Criar grupos de estudo',
+          'Metas compartilhadas',
+          'Ranking de pontos',
+          'Notificações prioritárias',
+        ],
+        isCurrent: user?.plan === 'basic'
+      },
+      {
+        id: 'premium' as PlanType,
+        name: 'Premium',
+        price: 'R$ 19,90/mês',
+        features: [
+          'Tudo do plano Basic',
+          'Até 50 grupos (20 membros cada)',
+          'Upload ilimitado de arquivos',
+          'Gerador de Testes com IA',
+          'Análises avançadas',
+          'Notificações personalizadas',
+          'Suporte prioritário',
+        ],
+        isCurrent: user?.plan === 'premium'
+      },
+    ];
+
 
   return (
     <PageLayout>
@@ -146,20 +167,6 @@ const Plans: React.FC = () => {
                 </li>
               ))}
               {/* Exclusive features */}
-              <li className="mt-4 pt-4 border-t border-gray-200">
-                <h4 className="text-sm font-medium mb-2 flex items-center">
-                  <Crown className="mr-1 h-4 w-4 text-yellow-500" />
-                  Conteúdo Exclusivo:
-                </h4>
-                <ul className="space-y-2 pl-6">
-                  {plans[2].exclusiveFeatures?.map((feature, index) => (
-                    <li key={`exclusive-${index}`} className="flex items-start">
-                      <CheckCircle2 className="mr-2 h-5 w-5 text-yellow-500 flex-shrink-0" />
-                      <span className="font-medium">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </li>
             </ul>
           </CardContent>
           <CardFooter>

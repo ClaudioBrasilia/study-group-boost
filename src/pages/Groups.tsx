@@ -264,23 +264,14 @@ const Groups: React.FC = () => {
           filteredGroups.map(group => (
             <div 
               key={group.id}
-              className={`card hover:border-study-primary cursor-pointer transition-colors ${group.isFixed ? 'border-l-4 border-l-study-primary' : ''}`}
+              className="card hover:border-study-primary cursor-pointer transition-colors"
               onClick={() => handleGroupClick(group)}
             >
               <div className="flex justify-between items-start">
                 <h3 className="font-semibold text-lg flex items-center">
                   {group.name}
-                  {group.isPremium && (
-                    <Crown className="ml-2 h-4 w-4 text-yellow-500" aria-label="Grupo Premium" />
-                  )}
                 </h3>
                 <div className="flex gap-1">
-                  {group.isFixed && (
-                    <Badge className="bg-study-primary">Grupo Fixo</Badge>
-                  )}
-                  {group.isPremium && (
-                    <Badge className="bg-yellow-500">Premium</Badge>
-                  )}
                   {group.isMember && (
                     <Badge variant="secondary">Membro</Badge>
                   )}

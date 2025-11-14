@@ -13,7 +13,7 @@ import { toast } from '@/components/ui/sonner';
 interface GroupGoalsTabProps {
   goals: GoalType[];
   subjects: Subject[];
-  isVestibularGroup: boolean;
+  isAdmin: boolean;
   newGoalSubject: string;
   setNewGoalSubject: (value: string) => void;
   newGoalType: 'exercises' | 'pages' | 'time';
@@ -28,7 +28,7 @@ interface GroupGoalsTabProps {
 const GroupGoalsTab: React.FC<GroupGoalsTabProps> = ({
   goals,
   subjects,
-  isVestibularGroup,
+  isAdmin,
   newGoalSubject,
   setNewGoalSubject,
   newGoalType,
@@ -69,7 +69,7 @@ const GroupGoalsTab: React.FC<GroupGoalsTabProps> = ({
       <div className="flex justify-between items-center">
         <h3 className="font-semibold">{t('goals.title')}</h3>
         
-        {!isVestibularGroup && (
+        {isAdmin && (
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-study-primary">
