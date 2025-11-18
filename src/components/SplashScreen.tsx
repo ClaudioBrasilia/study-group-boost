@@ -42,7 +42,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onFinished }) => {
             transition={{ delay: 0.4, duration: 0.5 }}
             className="text-3xl font-bold text-white mb-2"
           >
-            StudyBoost
+            Grupo Estuda
           </motion.h1>
           <motion.p
             initial={{ y: 20, opacity: 0 }}
