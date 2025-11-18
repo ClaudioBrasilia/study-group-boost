@@ -185,23 +185,65 @@ export const useStudyActivities = (groupId?: string) => {
     description: string,
     subjectId?: string
   ) => {
-    if (!user) return { success: false, error: 'Usuário não autenticado' };
+    if (!user) {
+      console.error('❌ Erro: Usuário não autenticado');
+      toast.error('Você precisa estar logado');
+      return { success: false, error: 'Usuário não autenticado' };
+    }
+
+    console.log('🚀 Iniciando criação de atividade...');
+    console.log('📋 Dados:', { targetGroupId, description, subjectId, photoSize: photo.size });
 
     try {
       setUploading(true);
 
+      // Validate user is member of the group
+      console.log('🔐 Validando permissões do usuário...');
+      const { data: membership, error: membershipError } = await supabase
+        .from('group_members')
+        .select('id')
+        .eq('group_id', targetGroupId)
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (membershipError) {
+        console.error('❌ Erro ao verificar permissões:', membershipError);
+        throw new Error(`Erro ao verificar permissões: ${membershipError.message}`);
+      }
+
+      if (!membership) {
+        console.error('❌ Usuário não é membro do grupo');
+        toast.error('Você não é membro deste grupo');
+        return { success: false, error: 'Não é membro do grupo' };
+      }
+
+      console.log('✅ Permissões validadas');
+
       // Compress image
+      console.log('📦 Comprimindo imagem...');
       const compressedPhoto = await compressImage(photo);
+      console.log('✅ Imagem comprimida:', {
+        tamanhoOriginal: photo.size,
+        tamanhoComprimido: compressedPhoto.size,
+        reducao: `${Math.round((1 - compressedPhoto.size / photo.size) * 100)}%`
+      });
 
       // Upload to storage
+      console.log('📤 Fazendo upload da imagem...');
       const fileName = `${user.id}/${Date.now()}.jpg`;
       const { error: uploadError } = await supabase.storage
         .from('study-activities')
         .upload(fileName, compressedPhoto);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        console.error('❌ Erro no upload:', uploadError);
+        throw new Error(`Upload falhou: ${uploadError.message}`);
+      }
+
+      console.log('✅ Upload concluído:', fileName);
 
       // Create activity record
+      console.log('💾 Criando registro no banco de dados...');
       const { data, error } = await supabase
         .from('study_activities')
         .insert({
@@ -215,18 +257,33 @@ export const useStudyActivities = (groupId?: string) => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Erro ao criar registro:', error);
+        throw new Error(`Banco falhou: ${error.message}`);
+      }
+
+      console.log('✅ Registro criado:', data.id);
 
       // Add points to user
-      await supabase.rpc('add_user_points', {
+      console.log('🎯 Adicionando pontos ao usuário...');
+      const { error: pointsError } = await supabase.rpc('add_user_points', {
         p_user_id: user.id,
         p_group_id: targetGroupId,
         p_points: 10,
       });
 
+      if (pointsError) {
+        console.error('⚠️ Erro ao adicionar pontos (não crítico):', pointsError);
+        // Não falhar aqui, pontos são secundários
+      } else {
+        console.log('✅ Pontos adicionados com sucesso');
+      }
+
       toast.success('Atividade criada com sucesso! +10 pontos');
+      console.log('✅ Atividade criada com sucesso!');
 
       // Refresh activities
+      console.log('🔄 Atualizando lista de atividades...');
       if (groupId) {
         await fetchGroupActivities();
       } else {
@@ -234,12 +291,14 @@ export const useStudyActivities = (groupId?: string) => {
       }
 
       return { success: true, data };
-    } catch (error) {
-      console.error('Error creating activity:', error);
-      toast.error('Erro ao criar atividade');
-      return { success: false, error: 'Erro ao criar atividade' };
+    } catch (error: any) {
+      console.error('❌ Erro completo ao criar atividade:', error);
+      const errorMessage = error.message || 'Erro desconhecido ao criar atividade';
+      toast.error(errorMessage);
+      return { success: false, error: errorMessage };
     } finally {
       setUploading(false);
+      console.log('🏁 Processo finalizado');
     }
   };
 
