@@ -187,10 +187,9 @@ export const CreateActivityDialog = ({
               <Label>Matéria (opcional)</Label>
               <Select value={selectedSubject} onValueChange={setSelectedSubject}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione a matéria" />
+                  <SelectValue placeholder="Selecione a matéria (opcional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Matéria Geral</SelectItem>
                   {currentGroupSubjects.map((subject) => (
                     <SelectItem key={subject.id} value={subject.id}>
                       {subject.name}
